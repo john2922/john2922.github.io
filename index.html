@@ -1,0 +1,4137 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>🏀 香港籃球生涯 · 完整強化版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', 'PingFang HK', sans-serif;
+            background: #1a1a2e;
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 12px;
+            position: relative;
+        }
+        .credit-mark {
+            position: fixed;
+            bottom: 12px;
+            right: 16px;
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 12px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            z-index: 999;
+            pointer-events: none;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+            backdrop-filter: blur(2px);
+        }
+        #app {
+            max-width: 920px;
+            width: 100%;
+            background: linear-gradient(145deg, #16213e, #0f3460);
+            border-radius: 32px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 165, 0, 0.2);
+            position: relative;
+        }
+        .cover-badge {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 11px;
+            margin-top: 4px;
+            letter-spacing: 1px;
+        }
+        .cover-badge strong {
+            color: rgba(255, 165, 0, 0.3);
+        }
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255, 165, 0, 0.3);
+            margin-bottom: 12px;
+            position: relative;
+        }
+        .game-title {
+            font-size: 24px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff8c00, #ff4500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .game-title .icon {
+            font-size: 30px;
+            -webkit-text-fill-color: initial;
+        }
+        .header-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .header-actions .btn-sm {
+            padding: 4px 12px;
+            font-size: 11px;
+            border-radius: 20px;
+            border: none;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .header-actions .btn-sm:hover {
+            background: rgba(255, 165, 0, 0.2);
+        }
+        .player-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 3px 10px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 165, 0, 0.2);
+            font-size: 11px;
+        }
+        .player-badge .number {
+            background: #ff8c00;
+            color: #1a1a2e;
+            font-weight: 900;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+        }
+        .player-badge .name {
+            font-weight: 700;
+            font-size: 13px;
+        }
+        .player-badge .pos {
+            background: rgba(255, 165, 0, 0.2);
+            padding: 0 8px;
+            border-radius: 12px;
+            color: #ffa500;
+            font-size: 11px;
+        }
+        .info-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 12px;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 6px 12px;
+            border-radius: 14px;
+            margin-bottom: 12px;
+            font-size: 11px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            align-items: center;
+            position: relative;
+        }
+        .info-item .label {
+            color: #8899bb;
+        }
+        .info-item .value {
+            color: #ffa500;
+            font-weight: 600;
+        }
+        .info-item .value.highlight {
+            color: #4fc3f7;
+        }
+        .info-item .value.big {
+            font-size: 22px;
+            font-weight: 900;
+            color: #ff6d00;
+            text-shadow: 0 0 20px rgba(255, 109, 0, 0.3);
+        }
+        .overall-box {
+            position: relative;
+            padding-left: 12px;
+            margin-left: auto;
+            border-left: 2px solid rgba(255, 165, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .overall-box .label {
+            color: #8899bb;
+            font-size: 11px;
+        }
+        .overall-box .value.big {
+            font-size: 26px;
+            font-weight: 900;
+            color: #ff6d00;
+            text-shadow: 0 0 30px rgba(255, 109, 0, 0.4);
+            line-height: 1;
+        }
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .page.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: #aabbdd;
+            margin-bottom: 3px;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.35);
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #ff8c00;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 18px;
+            border: none;
+            border-radius: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #ff8c00, #ff4500);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(255, 140, 0, 0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #00c853, #00e676);
+            color: #1a1a2e;
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #d50000, #ff1744);
+            color: #fff;
+        }
+        .btn-block {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .mt-10 {
+            margin-top: 10px;
+        }
+        .mb-10 {
+            margin-bottom: 10px;
+        }
+        .question-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 14px;
+            margin-bottom: 12px;
+        }
+        .question-box .q-text {
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.6;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .option-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 8px 14px;
+            color: #dde4f0;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .option-btn:hover:not(:disabled) {
+            background: rgba(255, 165, 0, 0.08);
+            border-color: rgba(255, 165, 0, 0.3);
+        }
+        .option-btn .tag {
+            background: rgba(255, 165, 0, 0.15);
+            color: #ffa500;
+            font-weight: 700;
+            padding: 0 8px;
+            border-radius: 8px;
+            font-size: 11px;
+        }
+        .option-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .option-btn.selected {
+            border-color: #ff8c00;
+            background: rgba(255, 140, 0, 0.12);
+        }
+        .result-box {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 16px;
+            padding: 14px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .result-box .dice {
+            font-size: 36px;
+        }
+        .result-box .result-text {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .positive {
+            color: #69f0ae;
+        }
+        .negative {
+            color: #ff8a80;
+        }
+        .neutral {
+            color: #ffd740;
+        }
+        .stat-change {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 12px;
+            justify-content: center;
+            margin-top: 6px;
+            font-size: 12px;
+        }
+        .stat-change .up {
+            color: #69f0ae;
+        }
+        .stat-change .down {
+            color: #ff8a80;
+        }
+        .school-reveal {
+            background: linear-gradient(135deg, rgba(255, 165, 0, 0.1), rgba(255, 69, 0, 0.05));
+            border: 2px solid #ff8c00;
+            border-radius: 16px;
+            padding: 14px;
+            text-align: center;
+            margin: 10px 0;
+        }
+        .school-reveal .school-name {
+            font-size: 22px;
+            font-weight: 900;
+            color: #ffa500;
+        }
+        .season-summary {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 12px;
+            margin: 10px 0;
+            font-size: 13px;
+            line-height: 1.8;
+        }
+        .season-summary .stat-big {
+            font-size: 22px;
+            font-weight: 900;
+            color: #ffd740;
+        }
+        .threads-box {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 12px;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #ff8c00;
+        }
+        .threads-box .thread {
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #c0d0e0;
+            font-size: 12px;
+        }
+        .threads-box .thread:last-child {
+            border-bottom: none;
+        }
+        .threads-box .thread .user {
+            color: #ffa500;
+            font-weight: 600;
+        }
+        .attr-distribute {
+            background: rgba(0, 0, 0, 0.25);
+            border-radius: 16px;
+            padding: 12px;
+            margin: 8px 0;
+        }
+        .attr-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .attr-row .attr-name {
+            flex: 1;
+            font-weight: 500;
+        }
+        .attr-row .attr-value {
+            width: 32px;
+            text-align: center;
+            font-weight: 700;
+            color: #ffa500;
+        }
+        .attr-row .attr-controls {
+            display: flex;
+            gap: 4px;
+        }
+        .attr-row .attr-controls button {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: none;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+            transition: 0.2s;
+        }
+        .attr-row .attr-controls button:hover {
+            background: rgba(255, 165, 0, 0.3);
+        }
+        .attr-row .attr-controls button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .points-display {
+            text-align: center;
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffd740;
+            margin: 6px 0;
+        }
+        .year-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 165, 0, 0.08);
+            padding: 6px 12px;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #ff8c00;
+        }
+        .year-display .year {
+            font-size: 15px;
+            font-weight: 700;
+        }
+        .year-display .year .highlight {
+            color: #ff8c00;
+        }
+        .year-display .progress {
+            font-size: 11px;
+            color: #8899bb;
+        }
+        .save-notification {
+            position: fixed;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e2a3a;
+            padding: 8px 20px;
+            border-radius: 30px;
+            border: 1px solid #ffa500;
+            color: #ffa500;
+            font-weight: 600;
+            font-size: 13px;
+            z-index: 999;
+            opacity: 0;
+            transition: opacity 0.4s;
+            pointer-events: none;
+        }
+        .save-notification.show {
+            opacity: 1;
+        }
+        .career-chart {
+            width: 100%;
+            max-width: 700px;
+            margin: 10px auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 12px;
+        }
+        .career-chart canvas {
+            width: 100% !important;
+            height: auto !important;
+            max-height: 280px;
+        }
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin: 8px 0;
+            max-height: 280px;
+            overflow-y: auto;
+            font-size: 12px;
+        }
+        .timeline .event {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border-left: 3px solid #ffa500;
+        }
+        .team-choice-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 10px 0;
+        }
+        .team-choice-btn {
+            padding: 12px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .team-choice-btn:hover {
+            background: rgba(255, 165, 0, 0.1);
+            border-color: #ffa500;
+        }
+        .team-choice-btn .team-name {
+            font-weight: 700;
+            color: #ffa500;
+        }
+        .team-choice-btn .team-detail {
+            font-size: 12px;
+            color: #8899bb;
+        }
+        .team-choice-btn .team-salary {
+            font-size: 12px;
+            color: #69f0ae;
+        }
+        .team-choice-btn .team-thought {
+            font-size: 12px;
+            color: #ffd740;
+            font-style: italic;
+            margin-top: 4px;
+        }
+        .injury-box {
+            background: rgba(255, 0, 0, 0.15);
+            border: 1px solid #ff5252;
+            border-radius: 14px;
+            padding: 12px;
+            margin: 10px 0;
+        }
+        .special-event {
+            background: rgba(255, 215, 0, 0.08);
+            border: 1px solid #ffd740;
+            border-radius: 14px;
+            padding: 12px;
+            margin: 10px 0;
+        }
+        .special-event .event-title {
+            color: #ffd740;
+            font-weight: 700;
+            font-size: 15px;
+        }
+        .seed-box {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 8px 12px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .seed-box .seed-label {
+            color: #8899bb;
+            font-size: 12px;
+        }
+        .seed-box .seed-value {
+            color: #ffa500;
+            font-weight: 700;
+            font-size: 14px;
+            font-family: monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 2px 10px;
+            border-radius: 8px;
+        }
+        .seed-box .seed-input {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            width: 140px;
+            font-size: 13px;
+        }
+        .seed-box .seed-input:focus {
+            border-color: #ffa500;
+            outline: none;
+        }
+        .match-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin: 8px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .match-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .match-item:hover {
+            background: rgba(255, 165, 0, 0.08);
+        }
+        .match-item .score {
+            font-weight: 700;
+            color: #ffd740;
+        }
+        .match-detail {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 8px;
+            margin-top: 4px;
+            font-size: 12px;
+            display: none;
+        }
+        .match-detail.show {
+            display: block;
+        }
+        .position-challenge {
+            background: rgba(79, 195, 247, 0.08);
+            border: 1px solid #4fc3f7;
+            border-radius: 14px;
+            padding: 12px;
+            margin: 10px 0;
+        }
+        .position-challenge .title {
+            color: #4fc3f7;
+            font-weight: 700;
+            font-size: 14px;
+        }
+        .position-challenge .desc {
+            font-size: 12px;
+            color: #aabbdd;
+            margin: 4px 0;
+        }
+        @media (max-width: 600px) {
+            #app {
+                padding: 14px;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .form-row-3 {
+                grid-template-columns: 1fr 1fr;
+            }
+            .game-title {
+                font-size: 17px;
+            }
+            .game-title .icon {
+                font-size: 22px;
+            }
+            .player-badge {
+                font-size: 10px;
+                padding: 2px 8px;
+            }
+            .player-badge .number {
+                width: 24px;
+                height: 24px;
+                font-size: 13px;
+            }
+            .info-bar {
+                font-size: 10px;
+                padding: 4px 8px;
+            }
+            .question-box .q-text {
+                font-size: 15px;
+            }
+            .option-btn {
+                font-size: 12px;
+                padding: 6px 10px;
+            }
+            .result-box .dice {
+                font-size: 30px;
+            }
+            .header-actions .btn-sm {
+                font-size: 10px;
+                padding: 3px 8px;
+            }
+            .career-chart canvas {
+                max-height: 220px;
+            }
+            .credit-mark {
+                font-size: 10px;
+                bottom: 6px;
+                right: 8px;
+                padding: 2px 10px;
+            }
+            .overall-box .value.big {
+                font-size: 20px;
+            }
+            .seed-box .seed-input {
+                width: 100px;
+                font-size: 12px;
+            }
+        }
+        .hidden {
+            display: none;
+        }
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .gap-8 {
+            gap: 8px;
+        }
+        .mt-6 {
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="credit-mark">mchun_2922</div>
+
+    <div id="app">
+        <div id="saveNotification" class="save-notification">✅ 已儲存</div>
+        <div class="game-header">
+            <div class="game-title"><span class="icon">🏀</span> 香港籃球生涯</div>
+            <div class="header-actions">
+                <button class="btn-sm" id="saveGameBtn">💾 保存</button>
+                <button class="btn-sm" id="loadGameBtn">📂 讀取</button>
+            </div>
+            <div class="player-badge" id="headerBadge" style="display:none;">
+                <div class="number" id="headerNumber">0</div>
+                <div class="name" id="headerName">球員</div>
+                <div class="pos" id="headerPos">PG</div>
+            </div>
+        </div>
+        <div class="info-bar" id="infoBar" style="display:none;">
+            <div class="info-item"><span class="label">🏫</span> <span class="value" id="infoSchool">-</span></div>
+            <div class="info-item"><span class="label">📏</span> <span class="value" id="infoHeight">-</span> cm</div>
+            <div class="info-item"><span class="label">🎂</span> <span class="value" id="infoAge">-</span> 歲</div>
+            <div class="info-item"><span class="label">⚖️</span> <span class="value" id="infoWeight">-</span> kg</div>
+            <div class="info-item"><span class="label">📚</span> <span class="value highlight" id="infoGrade">-</span></div>
+            <div class="info-item"><span class="label">🔵</span> <span class="value" id="infoPoints">-</span> 分值</div>
+            <div class="info-item" id="infoPhase"><span class="label">🏆</span> <span class="value" id="phaseText">高中</span></div>
+            <div class="info-item" id="infoContract"><span class="label">📄</span> <span class="value" id="contractText">-</span></div>
+            <div class="info-item" id="infoAcademic"><span class="label">📖</span> <span class="value" id="academicText">-</span></div>
+            <div class="info-item"><span class="label">💰</span> <span class="value" id="infoMoney">0</span> 萬</div>
+            <div class="overall-box">
+                <span class="label">總評</span>
+                <span class="value big" id="infoOverall">-</span>
+            </div>
+        </div>
+        <div class="game-content">
+            <!-- 創建頁面 -->
+            <div class="page active" id="pageCreate">
+                <div class="create-page">
+                    <h2 style="color:#ffa500;text-align:center;margin-bottom:4px;">🏀 創建你的籃球生涯</h2>
+                    <div class="cover-badge">⚡ 13歲中學生 &amp; DeepSeek 創作而成 ⚡</div>
+                    <p style="text-align:center;color:#8899bb;font-size:13px;margin:8px 0;">從13歲小B聯賽開始，目標甲一、香港隊、CBA、NCAA！</p>
+
+                    <div class="seed-box">
+                        <span class="seed-label">🔑 種子碼</span>
+                        <input type="text" class="seed-input" id="seedInput" placeholder="輸入或留空隨機">
+                        <button class="btn btn-secondary btn-sm" id="btnGenSeed" style="padding:4px 12px;font-size:12px;">🎲 隨機</button>
+                        <span style="font-size:11px;color:#8899bb;margin-left:auto;">相同種子碼 → 相同生涯</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label>球員姓名 <span class="hint">(2-6 字)</span></label>
+                        <input type="text" id="inputName" placeholder="例如：陳偉霆" maxlength="6">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group"><label>球衣號碼</label><input type="number" id="inputNumber" value="7" min="0" max="99"></div>
+                        <div class="form-group"><label>位置</label>
+                            <select id="inputPosition">
+                                <option value="PG">PG 控球後衛</option>
+                                <option value="SG">SG 得分後衛</option>
+                                <option value="SF" selected>SF 小前鋒</option>
+                                <option value="PF">PF 大前鋒</option>
+                                <option value="C">C 中鋒</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row-3">
+                        <div class="form-group"><label>身高 (cm)</label><input type="number" id="inputHeight" value="180" min="155" max="215"></div>
+                        <div class="form-group"><label>臂展 (cm)</label><input type="number" id="inputWingspan" value="185" min="150" max="235"></div>
+                        <div class="form-group"><label>體重 (kg)</label><input type="number" id="inputWeight" value="72" min="45" max="135"></div>
+                    </div>
+                    <div class="form-group">
+                        <label>出生地</label>
+                        <select id="inputRegion">
+                            <option value="中西區">中西區</option><option value="灣仔區">灣仔區</option><option value="東區">東區</option>
+                            <option value="南區">南區</option><option value="油尖旺區">油尖旺區</option><option value="深水埗區">深水埗區</option>
+                            <option value="九龍城區">九龍城區</option><option value="黃大仙區">黃大仙區</option><option value="觀塘區">觀塘區</option>
+                            <option value="葵青區">葵青區</option><option value="荃灣區">荃灣區</option><option value="屯門區">屯門區</option>
+                            <option value="元朗區">元朗區</option><option value="北區">北區</option><option value="大埔區">大埔區</option>
+                            <option value="沙田區">沙田區</option><option value="西貢區">西貢區</option><option value="離島區">離島區</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary btn-block" id="btnStartGame">🚀 開始生涯</button>
+                    <div id="createError" style="color:#ff8a80;font-size:13px;text-align:center;margin-top:4px;"></div>
+                </div>
+            </div>
+
+            <!-- 學校分配 -->
+            <div class="page" id="pageSchool">
+                <div style="text-align:center;padding:12px 0;">
+                    <div style="font-size:48px;margin-bottom:6px;">🏫</div>
+                    <h2 style="color:#ffa500;">你被分配到...</h2>
+                    <div class="school-reveal">
+                        <div class="school-name" id="schoolName">-</div>
+                        <div class="school-detail" id="schoolDetail">-</div>
+                    </div>
+                    <p style="color:#8899bb;font-size:13px;">這間學校屬於 <span id="schoolLeagueLabel">-</span> 聯賽</p>
+                    <button class="btn btn-primary mt-10" id="btnStartGameplay">🏀 開始征戰</button>
+                </div>
+            </div>
+
+            <!-- 能力分配 -->
+            <div class="page" id="pageDistribute">
+                <h3 style="color:#ffa500;text-align:center;margin-bottom:6px;">📊 能力分配</h3>
+                <p style="text-align:center;color:#8899bb;font-size:13px;" id="distributeDesc">分配你的能力點數</p>
+                <div class="points-display">可用分值：<span id="availPoints">10</span></div>
+                <div id="attrList" class="attr-distribute"></div>
+                <button class="btn btn-success btn-block" id="btnConfirmDistribute">✅ 確認分配</button>
+                <div id="distributeError" style="color:#ff8a80;text-align:center;margin-top:4px;"></div>
+            </div>
+
+            <!-- 高中選擇 -->
+            <div class="page" id="pageSchoolChoice">
+                <h3 style="color:#ffa500;text-align:center;margin-bottom:8px;">🏫 選擇高中學校</h3>
+                <p style="color:#8899bb;font-size:13px;text-align:center;">根據你的初中表現，有以下學校對你有興趣：</p>
+                <div id="schoolChoiceList" style="display:flex;flex-direction:column;gap:8px;margin:12px 0;"></div>
+                <button class="btn btn-secondary btn-block" id="btnSkipSchoolChoice">🤷 隨便選一間</button>
+            </div>
+
+            <!-- 球隊選擇 -->
+            <div class="page" id="pageTeamSelect">
+                <h3 style="color:#ffa500;text-align:center;margin-bottom:8px;">🏀 選擇你的職業球隊</h3>
+                <p style="color:#8899bb;font-size:13px;text-align:center;" id="teamSelectDesc">以下球隊對你感興趣：</p>
+                <div id="teamSelectList" class="team-choice-grid"></div>
+                <button class="btn btn-danger btn-block mt-10" id="btnTeamSelectRetire">退役</button>
+            </div>
+
+            <!-- NCAA -->
+            <div class="page" id="pageNCAA">
+                <h3 style="color:#ffa500;text-align:center;margin-bottom:8px;">🇺🇸 NCAA 機會</h3>
+                <div id="ncaaContent"></div>
+            </div>
+
+            <!-- 主遊戲 -->
+            <div class="page" id="pageGame">
+                <div id="gameContent"></div>
+            </div>
+
+            <!-- 生涯回顧 -->
+            <div class="page" id="pageCareerReview">
+                <h2 style="color:#ffa500;text-align:center;">📜 生涯回顧</h2>
+                <div id="careerReviewContent"></div>
+                <button class="btn btn-primary btn-block mt-10" id="btnBackToMenu">🏠 回到主選單</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================================================================
+        //  種子碼系統
+        // ================================================================
+        let SEED = null;
+        let RNG = null;
+
+        function seedRandom(seed) {
+            return function() {
+                seed = (seed * 9301 + 49297) % 233280;
+                return seed / 233280;
+            };
+        }
+
+        function rand(min, max) {
+            if (RNG) {
+                return Math.floor(RNG() * (max - min + 1)) + min;
+            }
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        function pick(arr) { return arr[rand(0, arr.length - 1)]; }
+
+        function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+        function shuffle(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = rand(0, i);
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // ================================================================
+        //  DATA
+        // ================================================================
+        const ATTR_KEYS = ['three', 'mid', 'finish', 'defense', 'rebound', 'condition'];
+        const ATTR_LABELS = { three: '三分', mid: '中投', finish: '終結', defense: '防守', rebound: '籃板', condition: '體能' };
+
+        const SCHOOLS = [
+            { name: '拔萃男書院', league: 'D1', type: '傳統名校', region: '九龍城區' },
+            { name: '喇沙書院', league: 'D1', type: '傳統名校', region: '九龍城區' },
+            { name: '英華書院', league: 'D1', type: '傳統名校', region: '深水埗區' },
+            { name: '聖若瑟書院', league: 'D1', type: '傳統名校', region: '中西區' },
+            { name: '真道書院', league: 'D1', type: '直資名校', region: '西貢區' },
+            { name: '寶覺中學', league: 'D1', type: '地區強權', region: '觀塘區' },
+            { name: '桂華山中學', league: 'D1', type: '地區強權', region: '東區' },
+            { name: '協和書院', league: 'D1', type: '地區強權', region: '黃大仙區' },
+            { name: '張振興伉儷書院', league: 'D1', type: '地區強權', region: '東區' },
+            { name: '裘錦秋中學', league: 'D1', type: '地區強權', region: '葵青區' },
+            { name: '可立中學', league: 'D1', type: '地區強權', region: '黃大仙區' },
+            { name: '林大輝中學', league: 'D1', type: '新興勢力', region: '沙田區' },
+            { name: '漢華中學', league: 'D1', type: '傳統名校', region: '東區' },
+            { name: '福建中學', league: 'D1', type: '直資名校', region: '觀塘區' },
+            { name: '香港華仁書院', league: 'D1', type: '傳統名校', region: '灣仔區' },
+            { name: '九龍華仁書院', league: 'D1', type: '傳統名校', region: '油尖旺區' },
+            { name: '聖保羅書院', league: 'D1', type: '傳統名校', region: '中西區' },
+            { name: '中華基督教會全完中學', league: 'D2', type: '地區學校', region: '葵青區' },
+            { name: '梁銶琚書院', league: 'D2', type: '地區學校', region: '屯門區' },
+            { name: '仁濟醫院第二中學', league: 'D2', type: '地區學校', region: '沙田區' },
+            { name: '東華三院黃鳳翎中學', league: 'D2', type: '地區學校', region: '中西區' },
+            { name: '潮州會館中學', league: 'D3', type: '地區學校', region: '深水埗區' },
+            { name: '新亞中學', league: 'D3', type: '地區學校', region: '黃大仙區' },
+        ];
+
+        const A1_TEAMS = ['南華', '永倫', '東方', '福建', '安保漢友', '滿貫', '建龍飛馬', '崇德飛鷹'];
+        const A2_TEAMS = ['旭暉', '晉龍', '飛鷹', '遊協', '安邦', '大埔'];
+        const COLLEGE_TEAMS = ['香港大學', '中文大學', '科技大學', '理工大學', '城市大學', '浸會大學', '教育大學', '嶺南大學'];
+        const CBA_TEAMS = ['廣東', '遼寧', '浙江', '新疆', '北京', '上海', '深圳', '廣州', '山東', '吉林'];
+        const NCAA_D1 = ['杜克大學', '北卡羅來納大學', '肯塔基大學', '堪薩斯大學', 'UCLA', '密西根州立', '維吉尼亞', '亞利桑那', '貢薩加', '普渡'];
+        const NCAA_D2 = ['加州州立', '佛羅里達南方', '西利伯提', '林登伍德', '西北拿撒勒', '塞頓希爾', '諾瓦東南', '亞斯伯里'];
+
+        const THOUGHTS = [
+            '可以跟這隊一起衝擊冠軍！', '這隊的球風非常適合我！', '終於有機會效力這支傳統強隊！',
+            '我從小就是這隊的球迷！', '這裡的教練和隊友感覺很好！', '這將是我職業生涯的起點！',
+            '我準備好在這裡發光發熱！', '加盟這隊是我的夢想！', '這隊的戰術體系讓我興奮！', '我相信能在這裡學到很多！',
+        ];
+
+        const INJURY_TYPES = [
+            { name: '踝關節扭傷', severity: 1, cost: 3, days: 14 },
+            { name: '肌肉拉傷', severity: 1, cost: 4, days: 21 },
+            { name: '膝蓋韌帶輕傷', severity: 2, cost: 8, days: 45 },
+            { name: '手指骨折', severity: 2, cost: 6, days: 30 },
+            { name: '背部拉傷', severity: 2, cost: 7, days: 40 },
+            { name: '十字韌帶撕裂', severity: 3, cost: 25, days: 180 },
+            { name: '阿基里斯腱斷裂', severity: 3, cost: 30, days: 240 },
+        ];
+
+        // 特殊事件池
+        const SPECIAL_EVENTS = [
+            { title: '🏃 深夜練球被抓', desc: '你偷偷在球場加練到深夜，被教練發現。', options: [
+                    { label: 'A. 誠實道歉', desc: '承諾不再犯', diff: 1, effect: 'academic' },
+                    { label: 'B. 解釋原因', desc: '表明你的熱情', diff: 2, effect: 'condition' },
+                    { label: 'C. 繼續加練', desc: '展現決心', diff: 4, effect: 'finish' }
+                ] },
+            { title: '👫 朋友約你出去玩', desc: '朋友們約你週末去玩，但你原本打算訓練。', options: [
+                    { label: 'A. 果斷拒絕', desc: '專注訓練', diff: 2, effect: 'condition' },
+                    { label: 'B. 一起去玩', desc: '放鬆心情', diff: 1, effect: 'academic' },
+                    { label: 'C. 折中方案', desc: '去半天，練半天', diff: 3, effect: 'mid' }
+                ] },
+            { title: '📱 社交媒體爭議', desc: '你在社交媒體上的言論引起爭議，隊友們議論紛紛。', options: [
+                    { label: 'A. 低調處理', desc: '刪文道歉', diff: 1, effect: 'academic' },
+                    { label: 'B. 堅持立場', desc: '不屈服輿論', diff: 3, effect: 'defense' },
+                    { label: 'C. 幽默回應', desc: '用玩笑化解', diff: 2, effect: 'mid' }
+                ] },
+            { title: '🏥 受傷康復期', desc: '你受傷了，但康復期間你如何度過？', options: [
+                    { label: 'A. 積極復健', desc: '盡快回歸', diff: 2, effect: 'condition' },
+                    { label: 'B. 觀摩學習', desc: '研究比賽錄影', diff: 1, effect: 'defense' },
+                    { label: 'C. 增加球商', desc: '閱讀戰術書', diff: 3, effect: 'mid' }
+                ] },
+            { title: '🎯 教練挑戰', desc: '教練在訓練中公開挑戰你，要你證明自己。', options: [
+                    { label: 'A. 接受挑戰', desc: '用實力說話', diff: 3, effect: 'finish' },
+                    { label: 'B. 低調回應', desc: '用行動證明', diff: 2, effect: 'three' },
+                    { label: 'C. 反擊教練', desc: '質疑教練方法', diff: 4, effect: 'defense' }
+                ] },
+            { title: '🍽️ 飲食失控', desc: '你最近飲食失控，體重上升影響狀態。', options: [
+                    { label: 'A. 嚴格控制', desc: '請營養師', diff: 2, effect: 'condition' },
+                    { label: 'B. 適度調整', desc: '減少高熱量', diff: 1, effect: 'academic' },
+                    { label: 'C. 增加訓練', desc: '消耗多餘熱量', diff: 3, effect: 'rebound' }
+                ] },
+            { title: '🎮 遊戲成癮', desc: '你沉迷打機，影響訓練和睡眠。', options: [
+                    { label: 'A. 戒除遊戲', desc: '專注籃球', diff: 2, effect: 'condition' },
+                    { label: 'B. 合理安排', desc: '只在休息時玩', diff: 1, effect: 'academic' },
+                    { label: 'C. 以遊戲激勵', desc: '贏了才玩', diff: 3, effect: 'three' }
+                ] },
+        ];
+
+        // ================================================================
+        //  GAME STATE
+        // ================================================================
+        let G = {
+            player: null,
+            year: 0,
+            questionIndex: 0,
+            attributes: {},
+            availablePoints: 0,
+            overall: 40,
+            academic: 40,
+            currentSchool: null,
+            answered: false,
+            selectedOption: -1,
+            lastResult: null,
+            gameOver: false,
+            careerHighlights: [],
+            seasonStats: [],
+            pointsEarnedThisSeason: 0,
+            distributed: false,
+            phase: 'highschool',
+            team: null,
+            contractYear: 0,
+            contractLength: 0,
+            freeAgent: false,
+            a1Year: 0,
+            a2Year: 0,
+            a1Stats: [],
+            a2Stats: [],
+            collegeTeam: null,
+            collegeYear: 0,
+            collegeStats: [],
+            cbaDraftAttempts: 0,
+            cbaDrafted: false,
+            cbaTeam: null,
+            cbaYear: 0,
+            cbaStats: [],
+            cbaContractLength: 0,
+            cbaContractYear: 0,
+            nationalGamesU19: false,
+            nationalGamesAdult: false,
+            allChinaGamesU19: 0,
+            allChinaGamesAdult: 0,
+            naiGaoPlayed: false,
+            naiGaoStats: [],
+            totalPoints: 0,
+            totalGames: 0,
+            totalAssists: 0,
+            totalRebounds: 0,
+            totalSalary: 0,
+            careerAwards: [],
+            hkTeam: false,
+            hkTeamYear: null,
+            developmentTeam: false,
+            allChinaGames: 0,
+            retired: false,
+            retirementReason: '',
+            finalEvaluation: '',
+            timeline: [],
+            allStarAppearances: 0,
+            allStarMVP: 0,
+            extraQuestionsActive: false,
+            extraQuestionsType: '',
+            extraQuestionsRemaining: 0,
+            money: 5,
+            injury: null,
+            peakAge: 33,
+            peakAttributes: null,
+            peakOverall: 0,
+            ncaaTeam: null,
+            ncaaLevel: null,
+            ncaaYear: 0,
+            age: 13,
+            position: 'SF',
+            // 新增
+            seasonMatches: [],
+            currentMatchIndex: 0,
+            showMatchDetail: false,
+            selectedMatch: null,
+            hkTeamExtraQuestions: 0,
+            hkTeamExtraActive: false,
+            positionChallengeActive: false,
+            positionChallengeDone: false,
+            growthSpurt: false,
+            growthSpurtAge: 0,
+            seedUsed: null,
+            // 多位置養成
+            positionTraining: [],
+            primaryPos: 'SF',
+            secondaryPos: null,
+            posVersatility: 0,
+        };
+
+        // ================================================================
+        //  UI Helpers
+        // ================================================================
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            const target = document.getElementById(id);
+            if (target) target.classList.add('active');
+        }
+
+        function updateHeader() {
+            const p = G.player;
+            if (!p) return;
+            document.getElementById('headerBadge').style.display = 'flex';
+            document.getElementById('headerNumber').textContent = p.number;
+            document.getElementById('headerName').textContent = p.name;
+            document.getElementById('headerPos').textContent = p.position;
+            document.getElementById('infoBar').style.display = 'flex';
+            let schoolName = '-';
+            if (G.phase === 'highschool') schoolName = G.currentSchool ? G.currentSchool.name : '-';
+            else if (G.phase === 'college') schoolName = G.collegeTeam || '-';
+            else if (G.phase === 'ncaa') schoolName = G.ncaaTeam || 'NCAA';
+            else if (G.phase === 'a1' || G.phase === 'a2') schoolName = G.team || '-';
+            else if (G.phase === 'cba') schoolName = G.cbaTeam || 'CBA';
+            document.getElementById('infoSchool').textContent = schoolName;
+            document.getElementById('infoHeight').textContent = p.height;
+            G.age = getCurrentAge();
+            document.getElementById('infoAge').textContent = G.age;
+            document.getElementById('infoWeight').textContent = p.weight;
+            let gradeText = '';
+            if (G.phase === 'highschool') gradeText = getGradeName(G.year);
+            else if (G.phase === 'college') gradeText = `大專 ${G.collegeYear + 1}`;
+            else if (G.phase === 'ncaa') gradeText = `NCAA ${G.ncaaLevel} 第${G.ncaaYear + 1}年`;
+            else if (G.phase === 'a1') gradeText = '甲一（業餘）';
+            else if (G.phase === 'a2') gradeText = '甲二（業餘）';
+            else if (G.phase === 'cba') gradeText = 'CBA';
+            document.getElementById('infoGrade').textContent = gradeText;
+            document.getElementById('infoOverall').textContent = G.overall;
+            document.getElementById('infoPoints').textContent = G.availablePoints;
+            let phaseText = '高中';
+            if (G.phase === 'college') phaseText = `大專 (${G.collegeTeam})`;
+            else if (G.phase === 'ncaa') phaseText = `NCAA ${G.ncaaLevel}`;
+            else if (G.phase === 'a1') phaseText = `甲一 (${G.team})`;
+            else if (G.phase === 'a2') phaseText = `甲二 (${G.team})`;
+            else if (G.phase === 'cba') phaseText = `CBA (${G.cbaTeam})`;
+            document.getElementById('phaseText').textContent = phaseText;
+            let contractText = '';
+            if (G.phase === 'a1' || G.phase === 'a2') {
+                if (G.freeAgent) contractText = '自由球員';
+                else if (G.contractLength > 0) contractText = `合約 ${G.contractYear}/${G.contractLength}`;
+                else contractText = '無合約';
+            } else if (G.phase === 'cba') {
+                if (G.freeAgent) contractText = '自由球員';
+                else if (G.cbaContractLength > 0) contractText = `CBA合約 ${G.cbaContractYear}/${G.cbaContractLength}`;
+                else contractText = '無合約';
+            } else {
+                contractText = (G.phase === 'college' || G.phase === 'ncaa') ? '學籍' : '學界';
+            }
+            document.getElementById('contractText').textContent = contractText;
+            document.getElementById('academicText').textContent = Math.round(G.academic);
+            document.getElementById('infoMoney').textContent = G.money.toFixed(1);
+        }
+
+        function showNotification(msg) {
+            const el = document.getElementById('saveNotification');
+            el.textContent = msg;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 2200);
+        }
+
+        function getGradeName(year) {
+            const names = ['小B聯賽 (中一)', '小B聯賽 (中二)', '大B聯賽 (中四)', 'Agrade聯賽 (中五)', '中六'];
+            if (year < 2) return names[year] || '小B聯賽';
+            if (year === 2) return '大B聯賽 (中四)';
+            if (year === 3) return 'Agrade聯賽 (中五)';
+            if (year >= 4) return '中六';
+            return names[year] || '中學';
+        }
+
+        function getShortGrade(year) {
+            const names = ['中一', '中二', '中四', '中五', '中六'];
+            if (year < 2) return names[year] || '中一';
+            if (year === 2) return '中四';
+            if (year === 3) return '中五';
+            if (year >= 4) return '中六';
+            return names[year] || '中學';
+        }
+
+        function getCurrentAge() {
+            if (G.phase === 'highschool') return 13 + G.year;
+            if (G.phase === 'ncaa') return 18 + G.ncaaYear;
+            if (G.phase === 'college') return 18 + G.collegeYear;
+            if (G.phase === 'a1' || G.phase === 'a2') return 22 + (G.a1Year + G.a2Year);
+            if (G.phase === 'cba') return 22 + (G.a1Year + G.a2Year + G.cbaYear);
+            return G.age || 13;
+        }
+
+        function calcOverall(attrs) {
+            let s = 0;
+            for (let k of ATTR_KEYS) s += attrs[k] || 40;
+            return Math.round(s / ATTR_KEYS.length);
+        }
+
+        function getAttrLabel(k) { return ATTR_LABELS[k] || k; }
+
+        function getCost(overall) {
+            if (overall < 50) return 1;
+            if (overall < 60) return 2;
+            if (overall < 70) return 3;
+            if (overall < 80) return 4;
+            if (overall < 90) return 5;
+            return 6;
+        }
+
+        // ================================================================
+        //  SAVE / LOAD
+        // ================================================================
+        function saveGame() {
+            try { localStorage.setItem('hkbball_save_v3', JSON.stringify(G));
+                showNotification('✅ 儲存成功'); } catch (e) { showNotification('❌ 儲存失敗'); }
+        }
+
+        function loadGame() {
+            try {
+                const data = localStorage.getItem('hkbball_save_v3');
+                if (!data) { showNotification('❌ 沒有存檔'); return; }
+                const parsed = JSON.parse(data);
+                if (!parsed.player) { showNotification('❌ 存檔無效'); return; }
+                Object.assign(G, parsed);
+                if (!G.attributes) G.attributes = {};
+                for (let k of ATTR_KEYS) if (!(k in G.attributes)) G.attributes[k] = 40;
+                G.overall = calcOverall(G.attributes);
+                if (!G.timeline) G.timeline = [];
+                if (!G.seasonStats) G.seasonStats = [];
+                if (!G.a1Stats) G.a1Stats = [];
+                if (!G.a2Stats) G.a2Stats = [];
+                if (!G.collegeStats) G.collegeStats = [];
+                if (!G.cbaStats) G.cbaStats = [];
+                if (!G.careerAwards) G.careerAwards = [];
+                if (G.money === undefined) G.money = 5;
+                if (!G.seasonMatches) G.seasonMatches = [];
+                if (!G.positionTraining) G.positionTraining = [];
+                showNotification('📂 讀取成功');
+                if (G.gameOver) {
+                    showPage('pageGame');
+                    renderGame();
+                } else {
+                    if (!G.distributed) { showDistributePage('繼續能力分配'); } else { showPage('pageGame');
+                        renderGame(); }
+                }
+                updateHeader();
+            } catch (e) { showNotification('❌ 讀取失敗');
+                console.error(e); }
+        }
+
+        // ================================================================
+        //  CREATE / SCHOOL
+        // ================================================================
+        function createPlayer() {
+            try {
+                const name = document.getElementById('inputName').value.trim();
+                const number = parseInt(document.getElementById('inputNumber').value) || 0;
+                const position = document.getElementById('inputPosition').value;
+                const height = parseInt(document.getElementById('inputHeight').value) || 180;
+                const wingspan = parseInt(document.getElementById('inputWingspan').value) || 185;
+                const weight = parseInt(document.getElementById('inputWeight').value) || 72;
+                const region = document.getElementById('inputRegion').value;
+                const seedVal = document.getElementById('seedInput').value.trim() || String(Date.now());
+                const errorEl = document.getElementById('createError');
+
+                if (name.length < 2 || name.length > 6) { errorEl.textContent = '❌ 姓名須為2-6字'; return false; }
+                if (number < 0 || number > 99) { errorEl.textContent = '❌ 號碼須為0-99'; return false; }
+                if (height < 155 || height > 215) { errorEl.textContent = '❌ 身高須為155-215'; return false; }
+                if (wingspan < height - 5 || wingspan > height + 20) { errorEl.textContent = '❌ 臂展範圍錯誤'; return false; }
+                if (weight < 45 || weight > 135) { errorEl.textContent = '❌ 體重須為45-135'; return false; }
+                errorEl.textContent = '';
+
+                // 設定種子
+                let seedNum = 0;
+                for (let i = 0; i < seedVal.length; i++) {
+                    seedNum = (seedNum * 31 + seedVal.charCodeAt(i)) % 2147483647;
+                }
+                if (seedNum === 0) seedNum = 12345;
+                SEED = seedNum;
+                RNG = seedRandom(SEED);
+                G.seedUsed = seedVal;
+
+                G.player = { name, number, position, height, wingspan, weight, region };
+                G.position = position;
+                G.primaryPos = position;
+                for (let k of ATTR_KEYS) G.attributes[k] = 40;
+                G.overall = 40;
+                G.academic = 40 + rand(0, 20);
+                G.availablePoints = 12;
+                G.distributed = false;
+                G.phase = 'highschool';
+                G.year = 0;
+                G.questionIndex = 0;
+                G.gameOver = false;
+                G.seasonStats = [];
+                G.a1Stats = [];
+                G.a2Stats = [];
+                G.collegeStats = [];
+                G.cbaStats = [];
+                G.careerHighlights = [];
+                G.timeline = [];
+                G.totalPoints = 0;
+                G.totalGames = 0;
+                G.totalAssists = 0;
+                G.totalRebounds = 0;
+                G.totalSalary = 0;
+                G.careerAwards = [];
+                G.hkTeam = false;
+                G.developmentTeam = false;
+                G.allChinaGames = 0;
+                G.team = null;
+                G.contractYear = 0;
+                G.contractLength = 0;
+                G.freeAgent = false;
+                G.a1Year = 0;
+                G.a2Year = 0;
+                G.collegeTeam = null;
+                G.collegeYear = 0;
+                G.cbaDraftAttempts = 0;
+                G.cbaDrafted = false;
+                G.cbaTeam = null;
+                G.cbaYear = 0;
+                G.cbaContractLength = 0;
+                G.cbaContractYear = 0;
+                G.nationalGamesU19 = false;
+                G.nationalGamesAdult = false;
+                G.allChinaGamesU19 = 0;
+                G.allChinaGamesAdult = 0;
+                G.naiGaoPlayed = false;
+                G.naiGaoStats = [];
+                G.allStarAppearances = 0;
+                G.allStarMVP = 0;
+                G.retired = false;
+                G.retirementReason = '';
+                G.finalEvaluation = '';
+                G.extraQuestionsActive = false;
+                G.extraQuestionsType = '';
+                G.extraQuestionsRemaining = 0;
+                G.money = 5;
+                G.injury = null;
+                G.peakAttributes = null;
+                G.peakOverall = 0;
+                G.ncaaTeam = null;
+                G.ncaaLevel = null;
+                G.ncaaYear = 0;
+                G.age = 13;
+                G.seasonMatches = [];
+                G.currentMatchIndex = 0;
+                G.showMatchDetail = false;
+                G.selectedMatch = null;
+                G.hkTeamExtraQuestions = 0;
+                G.hkTeamExtraActive = false;
+                G.positionChallengeActive = false;
+                G.positionChallengeDone = false;
+                G.growthSpurt = false;
+                G.growthSpurtAge = 0;
+                G.positionTraining = [];
+                G.primaryPos = position;
+                G.secondaryPos = null;
+                G.posVersatility = 0;
+
+                // 隨機分配學校
+                const school = pick(SCHOOLS);
+                G.currentSchool = { ...school };
+                document.getElementById('schoolName').textContent = school.name;
+                document.getElementById('schoolDetail').textContent = `🏆 ${school.league} · ${school.type} · 📍 ${school.region}`;
+                document.getElementById('schoolLeagueLabel').textContent = school.league;
+                showPage('pageSchool');
+                updateHeader();
+                return true;
+            } catch (e) {
+                console.error('createPlayer error:', e);
+                document.getElementById('createError').textContent = '❌ 創建失敗：' + e.message;
+                return false;
+            }
+        }
+
+        function startGameplay() {
+            if (!G.distributed) {
+                showDistributePage('初始能力分配 (12點)');
+                return;
+            }
+            G.answered = false;
+            G.gameOver = false;
+            showPage('pageGame');
+            updateHeader();
+            renderGame();
+        }
+
+        // ================================================================
+        //  DISTRIBUTE
+        // ================================================================
+        function showDistributePage(title) {
+            document.getElementById('distributeDesc').textContent = title || '分配你的能力點數';
+            renderDistribute();
+            showPage('pageDistribute');
+        }
+
+        function renderDistribute() {
+            const list = document.getElementById('attrList');
+            let html = '';
+            for (let k of ATTR_KEYS) {
+                const val = G.attributes[k] || 40;
+                html += `
+                    <div class="attr-row">
+                        <span class="attr-name">${getAttrLabel(k)}</span>
+                        <span class="attr-value" id="val_${k}">${val}</span>
+                        <div class="attr-controls">
+                            <button data-key="${k}" data-dir="-1">−</button>
+                            <button data-key="${k}" data-dir="1">+</button>
+                        </div>
+                    </div>
+                `;
+            }
+            list.innerHTML = html;
+            document.getElementById('availPoints').textContent = G.availablePoints;
+
+            list.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const key = this.dataset.key;
+                    const dir = parseInt(this.dataset.dir);
+                    const current = G.attributes[key] || 40;
+                    const overall = calcOverall(G.attributes);
+                    const cost = getCost(overall);
+                    if (dir === 1) {
+                        if (G.availablePoints < cost) {
+                            document.getElementById('distributeError').textContent = `❌ 總評 ${overall}，升級需 ${cost} 點`;
+                            return;
+                        }
+                        if (current >= 99) { document.getElementById('distributeError').textContent = '❌ 已達上限 99'; return; }
+                        G.attributes[key] = current + 1;
+                        G.availablePoints -= cost;
+                    } else {
+                        if (current <= 20) { document.getElementById('distributeError').textContent = '❌ 最低 20'; return; }
+                        G.attributes[key] = current - 1;
+                        G.availablePoints += 1;
+                    }
+                    document.getElementById('distributeError').textContent = '';
+                    G.overall = calcOverall(G.attributes);
+                    renderDistribute();
+                    updateHeader();
+                });
+            });
+            document.getElementById('availPoints').textContent = G.availablePoints;
+            G.overall = calcOverall(G.attributes);
+            updateHeader();
+        }
+
+        document.getElementById('btnConfirmDistribute').addEventListener('click', function() {
+            G.distributed = true;
+            G.overall = calcOverall(G.attributes);
+            if (G.age >= 28 && G.age <= 36 && G.overall > G.peakOverall) {
+                G.peakOverall = G.overall;
+                G.peakAttributes = { ...G.attributes };
+                G.peakAge = G.age;
+            }
+            updateHeader();
+            if (G.phase === 'highschool' && G.year === 0 && G.questionIndex === 0 && !G.answered) {
+                startGameplay();
+            } else {
+                showPage('pageGame');
+                renderGame();
+            }
+        });
+
+        // ================================================================
+        //  高中選擇學校
+        // ================================================================
+        function showSchoolChoice() {
+            const overall = G.overall;
+            let pool = [];
+            if (overall >= 60) pool = SCHOOLS.filter(s => s.league === 'D1');
+            else if (overall >= 45) pool = SCHOOLS.filter(s => s.league === 'D1' || s.league === 'D2');
+            else pool = SCHOOLS;
+            const shuffled = shuffle(pool);
+            const selected = shuffled.slice(0, 5);
+            const container = document.getElementById('schoolChoiceList');
+            container.innerHTML = '';
+            selected.forEach(school => {
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-secondary btn-block';
+                btn.textContent = `${school.name} (${school.league}) — ${school.type}`;
+                btn.addEventListener('click', () => {
+                    G.currentSchool = { ...school };
+                    G.careerHighlights.push(`高中選擇 ${school.name}`);
+                    G.timeline.push({ year: `中四`, text: `入讀 ${school.name}`, period: '學生' });
+                    G.year = 2;
+                    G.questionIndex = 0;
+                    G.answered = false;
+                    G.distributed = false;
+                    showDistributePage('高中能力分配');
+                    updateHeader();
+                });
+                container.appendChild(btn);
+            });
+            showPage('pageSchoolChoice');
+        }
+
+        document.getElementById('btnSkipSchoolChoice').addEventListener('click', function() {
+            const school = pick(SCHOOLS);
+            G.currentSchool = { ...school };
+            G.careerHighlights.push(`高中選擇 ${school.name}`);
+            G.timeline.push({ year: `中四`, text: `入讀 ${school.name}`, period: '學生' });
+            G.year = 2;
+            G.questionIndex = 0;
+            G.answered = false;
+            G.distributed = false;
+            showDistributePage('高中能力分配');
+            updateHeader();
+        });
+
+        // ================================================================
+        //  球隊選擇
+        // ================================================================
+        function showTeamSelect(desc) {
+            document.getElementById('teamSelectDesc').textContent = desc || '以下球隊對你感興趣：';
+            const container = document.getElementById('teamSelectList');
+            container.innerHTML = '';
+            const overall = G.overall;
+            let pool = [];
+            if (overall >= 50) {
+                pool = A1_TEAMS.map(name => ({ name, league: '甲一', salary: (50 + rand(0, 30)) * 10000 }));
+            } else if (overall >= 40) {
+                pool = A2_TEAMS.map(name => ({ name, league: '甲二', salary: (15 + rand(0, 12)) * 10000 }));
+            } else {
+                container.innerHTML = `<p style="color:#ff8a80;">沒有球隊對你感興趣，你只能退役。</p>`;
+                document.getElementById('btnTeamSelectRetire').style.display = 'block';
+                return;
+            }
+            const shuffled = shuffle(pool);
+            const selected = shuffled.slice(0, rand(3, 5));
+            selected.forEach(team => {
+                const thought = pick(THOUGHTS);
+                const div = document.createElement('div');
+                div.className = 'team-choice-btn';
+                div.innerHTML = `
+                    <div class="team-name">${team.name}</div>
+                    <div class="team-detail">${team.league}（業餘聯賽）</div>
+                    <div class="team-salary">💰 年薪 $${(team.salary / 10000).toFixed(1)} 萬</div>
+                    <div class="team-thought">💭 ${thought}</div>
+                `;
+                div.addEventListener('click', () => {
+                    G.team = team.name;
+                    G.phase = team.league === '甲一' ? 'a1' : 'a2';
+                    G.contractYear = 1;
+                    G.contractLength = rand(1, 2);
+                    G.freeAgent = false;
+                    if (G.phase === 'a1') G.a1Year = 0;
+                    else G.a2Year = 0;
+                    G.totalSalary += team.salary;
+                    G.money += team.salary / 10000;
+                    G.timeline.push({ year: '職業', text: `簽約 ${team.name} (${team.league}) ${G.contractLength}年`,
+                        period: '業餘' });
+                    G.careerHighlights.push(`加盟 ${team.name}`);
+                    G.distributed = false;
+                    showDistributePage('職業能力分配');
+                    updateHeader();
+                });
+                container.appendChild(div);
+            });
+            document.getElementById('btnTeamSelectRetire').style.display = 'block';
+            showPage('pageTeamSelect');
+        }
+
+        document.getElementById('btnTeamSelectRetire').addEventListener('click', function() {
+            G.retired = true;
+            G.retirementReason = '選擇退役';
+            G.gameOver = true;
+            renderGame();
+        });
+
+        // ================================================================
+        //  NCAA 機會
+        // ================================================================
+        function showNCAAChance() {
+            const overall = G.overall;
+            let d1Chance = 0,
+                d2Chance = 0;
+            if (overall >= 78) { d1Chance = 55;
+                d2Chance = 30; } else if (overall >= 70) { d1Chance = 25;
+                d2Chance = 40; } else if (overall >= 62) { d1Chance = 8;
+                d2Chance = 35; } else if (overall >= 55) { d1Chance = 2;
+                d2Chance = 20; } else { d1Chance = 0;
+                d2Chance = 5; }
+
+            const roll = rand(1, 100);
+            let offer = null;
+            if (roll <= d1Chance) offer = { level: 'D1', team: pick(NCAA_D1) };
+            else if (roll <= d1Chance + d2Chance) offer = { level: 'D2', team: pick(NCAA_D2) };
+
+            const container = document.getElementById('ncaaContent');
+            if (!offer) {
+                container.innerHTML = `
+                    <div class="season-summary">
+                        <p>你沒有收到 NCAA 的獎學金邀請。</p>
+                        <p>總評 ${overall} 的機會較低。</p>
+                    </div>
+                    <button class="btn btn-primary btn-block" id="btnSkipNCAA">繼續選擇香港出路</button>
+                `;
+                document.getElementById('btnSkipNCAA').addEventListener('click', () => {
+                    showGraduationChoices();
+                });
+            } else {
+                container.innerHTML = `
+                    <div class="season-summary">
+                        <p style="font-size:18px;color:#ffd740;">🇺🇸 恭喜！你收到 NCAA ${offer.level} 獎學金！</p>
+                        <p>學校：<strong>${offer.team}</strong></p>
+                        <p>這是一個改變人生的機會，但將遠離香港。</p>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <button class="btn btn-success btn-block" id="btnAcceptNCAA">✅ 接受 NCAA ${offer.level} 邀請</button>
+                        <button class="btn btn-secondary btn-block" id="btnDeclineNCAA">❌ 拒絕，留在香港發展</button>
+                    </div>
+                `;
+                document.getElementById('btnAcceptNCAA').addEventListener('click', () => {
+                    G.phase = 'ncaa';
+                    G.ncaaLevel = offer.level;
+                    G.ncaaTeam = offer.team;
+                    G.ncaaYear = 0;
+                    G.questionIndex = 0;
+                    G.answered = false;
+                    G.distributed = false;
+                    G.timeline.push({ year: 'NCAA', text: `赴美就讀 ${offer.team} (${offer.level})`, period: '學生' });
+                    G.careerHighlights.push(`NCAA ${offer.level} 獎學金`);
+                    showDistributePage('NCAA 能力分配');
+                    updateHeader();
+                });
+                document.getElementById('btnDeclineNCAA').addEventListener('click', () => {
+                    showGraduationChoices();
+                });
+            }
+            showPage('pageNCAA');
+        }
+
+        function showGraduationChoices() {
+            G.phase = 'highschool';
+            renderSeasonEnd(document.getElementById('gameContent'), true);
+            showPage('pageGame');
+        }
+
+        // ================================================================
+        //  傷病系統
+        // ================================================================
+        function checkInjury() {
+            if (G.injury) return false;
+            const chance = G.phase === 'cba' ? 18 : (G.phase === 'a1' || G.phase === 'a2' ? 12 : 8);
+            if (rand(1, 100) > chance) return false;
+            const inj = pick(INJURY_TYPES);
+            G.injury = { ...inj, treated: false };
+            return true;
+        }
+
+        function treatInjury() {
+            if (!G.injury || G.injury.treated) return;
+            if (G.money < G.injury.cost) {
+                showNotification(`❌ 資金不足，需要 ${G.injury.cost} 萬`);
+                return false;
+            }
+            G.money -= G.injury.cost;
+            G.injury.treated = true;
+            G.attributes.condition = clamp(G.attributes.condition - rand(2, 5), 20, 99);
+            G.overall = calcOverall(G.attributes);
+            showNotification(`💊 已治療 ${G.injury.name}，花費 ${G.injury.cost} 萬`);
+            return true;
+        }
+
+        // ================================================================
+        //  發育期長高
+        // ================================================================
+        function checkGrowthSpurt() {
+            if (G.growthSpurt) return false;
+            const age = getCurrentAge();
+            if (age < 13 || age > 18) return false;
+            // 13-18歲有機會長高
+            const chance = 18 - (age - 13) * 2; // 13歲18%, 18歲8%
+            if (rand(1, 100) > chance) return false;
+            const grow = rand(2, 6);
+            G.player.height += grow;
+            G.growthSpurt = true;
+            G.growthSpurtAge = age;
+            G.timeline.push({ year: `${age}歲`, text: `🌱 發育期長高了 ${grow} cm！現在 ${G.player.height} cm`, period: '成長' });
+            showNotification(`🌱 你長高了 ${grow} cm！現在 ${G.player.height} cm`);
+            return true;
+        }
+
+        // ================================================================
+        //  多位置養成
+        // ================================================================
+        function checkPositionChallenge() {
+            if (G.positionChallengeDone) return false;
+            if (G.phase !== 'a1' && G.phase !== 'a2' && G.phase !== 'cba') return false;
+            if (G.positionTraining.length >= 3) return false;
+            if (rand(1, 100) > 25) return false;
+
+            const allPos = ['PG', 'SG', 'SF', 'PF', 'C'];
+            const currentPos = G.primaryPos;
+            const available = allPos.filter(p => p !== currentPos && !G.positionTraining.includes(p));
+            if (available.length === 0) return false;
+            const newPos = pick(available);
+            G.positionChallengeActive = true;
+            G.positionChallengePos = newPos;
+            return true;
+        }
+
+        function renderPositionChallenge(container) {
+            const pos = G.positionChallengePos;
+            const posNames = { PG: '控球後衛', SG: '得分後衛', SF: '小前鋒', PF: '大前鋒', C: '中鋒' };
+            let html = `
+                <div class="position-challenge">
+                    <div class="title">🔀 多位置養成計劃</div>
+                    <div class="desc">教練想讓你在 <strong>${posNames[pos]}</strong> 位置輪替，學習不同的攻防責任。</div>
+                    <div class="desc" style="color:#ffd740;">接受挑戰可提升球商與全面性，有機會提高潛力！</div>
+                    <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+                        <button class="btn btn-success" id="btnAcceptPosChallenge">✅ 接受挑戰</button>
+                        <button class="btn btn-secondary" id="btnDeclinePosChallenge">❌ 專注原位置</button>
+                    </div>
+                </div>
+            `;
+            container.innerHTML += html;
+
+            document.getElementById('btnAcceptPosChallenge').addEventListener('click', () => {
+                G.positionTraining.push(pos);
+                G.secondaryPos = pos;
+                G.posVersatility += 1;
+                G.positionChallengeDone = true;
+                G.positionChallengeActive = false;
+                // 獎勵：屬性提升
+                const bonus = rand(1, 3);
+                const attr = pick(ATTR_KEYS);
+                G.attributes[attr] = clamp(G.attributes[attr] + bonus, 20, 99);
+                G.availablePoints += 2;
+                G.overall = calcOverall(G.attributes);
+                G.timeline.push({ year: '職業', text: `🔀 接受多位置訓練，學習 ${posNames[pos]}`, period: '訓練' });
+                showNotification(`✅ 接受挑戰！${getAttrLabel(attr)} +${bonus}，獲得 2 分值`);
+                G.answered = false;
+                renderGame();
+            });
+
+            document.getElementById('btnDeclinePosChallenge').addEventListener('click', () => {
+                G.positionChallengeDone = true;
+                G.positionChallengeActive = false;
+                G.timeline.push({ year: '職業', text: `❌ 拒絕多位置訓練，專注 ${posNames[G.primaryPos]}`, period: '訓練' });
+                showNotification('❌ 你選擇專注原位置');
+                G.answered = false;
+                renderGame();
+            });
+        }
+
+        // ================================================================
+        //  特殊事件
+        // ================================================================
+        let specialEventTriggered = false;
+
+        function checkSpecialEvent() {
+            if (specialEventTriggered) return false;
+            if (G.phase !== 'highschool') return false;
+            if (G.answered) return false;
+            if (rand(1, 100) > 20) return false;
+            specialEventTriggered = true;
+            return true;
+        }
+
+        function renderSpecialEvent(container) {
+            const event = pick(SPECIAL_EVENTS);
+            G.currentSpecialEvent = event;
+            let html = `
+                <div class="special-event">
+                    <div class="event-title">${event.title}</div>
+                    <p style="color:#dde4f0;margin:4px 0;">${event.desc}</p>
+                    <div class="options">
+            `;
+            const labels = ['A', 'B', 'C'];
+            event.options.forEach((opt, idx) => {
+                const disabled = G.answered ? 'disabled' : '';
+                const selected = G.answered && G.selectedOption === idx ? 'selected' : '';
+                html += `
+                    <button class="option-btn ${selected}" data-optidx="${idx}" ${disabled}>
+                        <span class="tag">${labels[idx]}</span>
+                        <span><strong>${opt.label}</strong> — ${opt.desc}</span>
+                    </button>
+                `;
+            });
+            html += `</div>`;
+
+            if (G.answered) {
+                const res = G.lastResult;
+                const diceEmoji = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'][res.dice - 1] || '🎲';
+                const statusClass = res.good ? 'positive' : (res.bad ? 'negative' : 'neutral');
+                const statusText = res.good ? '✅ 成功！' : (res.bad ? '❌ 失敗...' : '⚖️ 平穩');
+                html += `
+                    <div class="result-box">
+                        <div class="dice">${diceEmoji}</div>
+                        <div class="result-text"><span class="${statusClass}">${statusText}</span><br>${res.text}</div>
+                        <div class="stat-change">${res.changes.map(c => `<span class="${c.val>0?'up':'down'}">${c.label} ${c.val>0?'+':''}${c.val}</span>`).join('')}</div>
+                    </div>
+                    <button class="btn btn-primary btn-block" id="btnNextSpecialEvent">➡️ 繼續</button>
+                `;
+            }
+
+            container.innerHTML += html;
+
+            if (!G.answered) {
+                container.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = parseInt(this.dataset.optidx);
+                        handleSpecialEventAnswer(idx);
+                    });
+                });
+            } else {
+                const nextBtn = document.getElementById('btnNextSpecialEvent');
+                if (nextBtn) nextBtn.addEventListener('click', () => {
+                    G.answered = false;
+                    specialEventTriggered = false;
+                    G.currentSpecialEvent = null;
+                    renderGame();
+                });
+            }
+        }
+
+        function handleSpecialEventAnswer(optIdx) {
+            if (G.answered) return;
+            G.answered = true;
+            G.selectedOption = optIdx;
+            const event = G.currentSpecialEvent;
+            const opt = event.options[optIdx];
+            const dice = rand(1, 6);
+            const diff = opt.diff || 2;
+            let good = false,
+                bad = false,
+                effect = 0,
+                resultText = '';
+            if (dice >= 5) { good = true;
+                effect = Math.round((diff * 2.2 + rand(0, 3)) * 0.8);
+                resultText = pick(['處理得當！', '展現智慧！', '贏得尊重！']); } else if (dice >= 3) { good = false;
+                bad = false;
+                effect = rand(0, 2);
+                resultText = pick(['平穩度過', '妥善處理']); } else { bad = true;
+                effect = -Math.round((diff * 1.8 + rand(0, 3)) * 0.6);
+                resultText = pick(['處理不當', '引發爭議']); }
+
+            effect = clamp(effect, -5, 7);
+            const target = opt.effect || 'condition';
+            let changes = [];
+            if (target === 'academic') {
+                G.academic = clamp(G.academic + effect, 0, 100);
+                changes.push({ label: '學業', val: effect });
+            } else if (target === 'condition') {
+                G.attributes.condition = clamp(G.attributes.condition + effect, 20, 99);
+                changes.push({ label: '體能', val: effect });
+            } else if (target === 'finish') {
+                G.attributes.finish = clamp(G.attributes.finish + effect, 20, 99);
+                changes.push({ label: '終結', val: effect });
+            } else if (target === 'mid') {
+                G.attributes.mid = clamp(G.attributes.mid + effect, 20, 99);
+                changes.push({ label: '中投', val: effect });
+            } else if (target === 'three') {
+                G.attributes.three = clamp(G.attributes.three + effect, 20, 99);
+                changes.push({ label: '三分', val: effect });
+            } else if (target === 'defense') {
+                G.attributes.defense = clamp(G.attributes.defense + effect, 20, 99);
+                changes.push({ label: '防守', val: effect });
+            } else if (target === 'rebound') {
+                G.attributes.rebound = clamp(G.attributes.rebound + effect, 20, 99);
+                changes.push({ label: '籃板', val: effect });
+            }
+
+            G.overall = calcOverall(G.attributes);
+            G.lastResult = { dice, good, bad, text: resultText, changes, optIdx };
+            if (good && dice === 6) G.careerHighlights.push('特殊事件高光！');
+            renderGame();
+        }
+
+        // ================================================================
+        //  RENDER GAME
+        // ================================================================
+        function renderGame() {
+            const container = document.getElementById('gameContent');
+            if (G.gameOver || G.age >= 50) {
+                if (G.age >= 50 && !G.retired) {
+                    G.retired = true;
+                    G.retirementReason = '年滿50歲強制退役';
+                    G.gameOver = true;
+                }
+                renderGameOver(container);
+                return;
+            }
+
+            // 檢查發育期長高
+            checkGrowthSpurt();
+
+            // 檢查多位置挑戰
+            if (checkPositionChallenge()) {
+                renderPositionChallenge(container);
+                return;
+            }
+
+            // 檢查特殊事件
+            if (checkSpecialEvent() && G.phase === 'highschool') {
+                renderSpecialEvent(container);
+                return;
+            }
+
+            if (G.hkTeamExtraActive && G.hkTeamExtraQuestions > 0) {
+                renderHKTeamExtraQuestions(container);
+                return;
+            }
+
+            if (G.extraQuestionsActive && G.extraQuestionsRemaining > 0) {
+                renderExtraQuestions(container);
+                return;
+            }
+
+            if (G.phase === 'highschool') {
+                renderHighSchool(container);
+            } else if (G.phase === 'college') {
+                renderCollege(container);
+            } else if (G.phase === 'ncaa') {
+                renderNCAA(container);
+            } else if (G.phase === 'a1' || G.phase === 'a2' || G.phase === 'cba') {
+                if (G.freeAgent || (G.phase === 'cba' && G.cbaContractYear > G.cbaContractLength) || (G.phase !==
+                        'cba' && G.contractYear > G.contractLength)) {
+                    renderContractManagement(container);
+                } else {
+                    renderPro(container);
+                }
+            }
+        }
+
+        // ================================================================
+        //  香港隊額外問題
+        // ================================================================
+        function renderHKTeamExtraQuestions(container) {
+            const total = G.hkTeamExtraQuestions;
+            const done = 5 - total;
+            const questions = generateHKTeamQuestions();
+            const q = questions[done] || questions[0];
+
+            let html = `
+                <div class="year-display">
+                    <div class="year">🇭🇰 香港代表隊 <span class="highlight">額外訓練 ${done+1}/${questions.length}</span></div>
+                    <div class="progress">剩餘 ${total} 題</div>
+                </div>
+                <div class="question-box">
+                    <div class="q-text">${q.text}</div>
+                </div>
+                <div class="options">
+            `;
+            const labels = ['A', 'B', 'C'];
+            q.options.forEach((opt, idx) => {
+                const disabled = G.answered ? 'disabled' : '';
+                const selected = G.answered && G.selectedOption === idx ? 'selected' : '';
+                html += `
+                    <button class="option-btn ${selected}" data-optidx="${idx}" ${disabled}>
+                        <span class="tag">${labels[idx]}</span>
+                        <span><strong>${opt.label}</strong> — ${opt.desc}</span>
+                    </button>
+                `;
+            });
+            html += `</div>`;
+
+            if (G.answered) {
+                const res = G.lastResult;
+                const diceEmoji = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'][res.dice - 1] || '🎲';
+                const statusClass = res.good ? 'positive' : (res.bad ? 'negative' : 'neutral');
+                const statusText = res.good ? '✅ 成功！' : (res.bad ? '❌ 失敗...' : '⚖️ 平穩');
+                html += `
+                    <div class="result-box">
+                        <div class="dice">${diceEmoji}</div>
+                        <div class="result-text"><span class="${statusClass}">${statusText}</span><br>${res.text}</div>
+                        <div class="stat-change">${res.changes.map(c => `<span class="${c.val>0?'up':'down'}">${c.label} ${c.val>0?'+':''}${c.val}</span>`).join('')}</div>
+                    </div>
+                    <button class="btn btn-primary btn-block" id="btnNextHKQuestion">➡️ 繼續</button>
+                `;
+            }
+
+            container.innerHTML = html;
+
+            if (!G.answered) {
+                container.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = parseInt(this.dataset.optidx);
+                        handleHKTeamExtraAnswer(idx);
+                    });
+                });
+            } else {
+                const nextBtn = document.getElementById('btnNextHKQuestion');
+                if (nextBtn) nextBtn.addEventListener('click', () => {
+                    G.answered = false;
+                    G.hkTeamExtraQuestions--;
+                    if (G.hkTeamExtraQuestions <= 0) {
+                        G.hkTeamExtraActive = false;
+                        G.questionIndex = 0;
+                    }
+                    renderGame();
+                });
+            }
+            updateHeader();
+        }
+
+        function generateHKTeamQuestions() {
+            return [
+                { text: '香港隊集訓，你如何適應更高強度的訓練？', options: [
+                        { label: 'A. 加倍努力', desc: '跟上節奏', diff: 2 },
+                        { label: 'B. 觀察學習', desc: '向老隊員請教', diff: 1 },
+                        { label: 'C. 展現自己', desc: '爭取正選', diff: 4 }
+                    ] },
+                { text: '國際賽對手實力強勁，你如何應對？', options: [
+                        { label: 'A. 穩健防守', desc: '先做好本份', diff: 2 },
+                        { label: 'B. 積極進攻', desc: '不畏強敵', diff: 3 },
+                        { label: 'C. 放手一搏', desc: '挑戰極限', diff: 5 }
+                    ] },
+                { text: '隊內氣氛緊張，你如何團結隊友？', options: [
+                        { label: 'A. 以身作則', desc: '用行動感染', diff: 2 },
+                        { label: 'B. 溝通調解', desc: '化解矛盾', diff: 1 },
+                        { label: 'C. 組織活動', desc: '增進感情', diff: 3 }
+                    ] },
+                { text: '教練對你期望很高，你如何回應？', options: [
+                        { label: 'A. 默默努力', desc: '用表現說話', diff: 2 },
+                        { label: 'B. 承諾目標', desc: '給教練信心', diff: 3 },
+                        { label: 'C. 超額完成', desc: '驚艷全場', diff: 5 }
+                    ] },
+                { text: '香港隊友誼賽，你希望留下什麼？', options: [
+                        { label: 'A. 團隊勝利', desc: '贏波為先', diff: 2 },
+                        { label: 'B. 個人表現', desc: '爭取好數據', diff: 3 },
+                        { label: 'C. 經典時刻', desc: '創造回憶', diff: 4 }
+                    ] }
+            ];
+        }
+
+        function handleHKTeamExtraAnswer(optIdx) {
+            if (G.answered) return;
+            G.answered = true;
+            G.selectedOption = optIdx;
+            const questions = generateHKTeamQuestions();
+            const done = 5 - G.hkTeamExtraQuestions;
+            const q = questions[done] || questions[0];
+            const opt = q.options[optIdx];
+            const dice = rand(1, 6);
+            const diff = opt.diff || 2;
+            let good = false,
+                bad = false,
+                effect = 0,
+                resultText = '';
+            if (dice >= 5) { good = true;
+                effect = Math.round((diff * 2.5 + rand(0, 3)) * 0.75);
+                resultText = pick(['香港隊表現出色！', '國際賽場發光！', '贏得教練信任！']); } else if (dice >= 3) { good = false;
+                bad = false;
+                effect = rand(0, 2);
+                resultText = pick(['平穩發揮', '適應國際節奏']); } else { bad = true;
+                effect = -Math.round((diff * 2 + rand(0, 3)) * 0.55);
+                resultText = pick(['國際賽經驗不足', '被對手壓制']); }
+
+            effect = clamp(effect, -5, 8);
+            const affected = shuffle([...ATTR_KEYS]).slice(0, 2);
+            const changes = [];
+            for (let k of affected) {
+                const change = Math.round(effect / 2 * (0.8 + Math.random() * 0.4));
+                const actual = clamp(change, -4, 6);
+                G.attributes[k] = clamp(G.attributes[k] + actual, 20, 99);
+                changes.push({ label: getAttrLabel(k), val: actual });
+            }
+            G.overall = calcOverall(G.attributes);
+            G.lastResult = { dice, good, bad, text: resultText, changes, optIdx };
+            if (good && dice === 6) G.careerHighlights.push('香港隊高光！');
+            renderGame();
+        }
+
+        // ================================================================
+        //  高中 (改良版)
+        // ================================================================
+        function getQuestionsForYear(year) {
+            const base = [
+                // 中一 (小B聯賽)
+                [
+                    { text: '小B聯賽首戰，你希望如何定位自己？', options: [
+                            { label: 'A. 穩健防守', desc: '先做好防守，贏得教練信任', diff: 2 },
+                            { label: 'B. 積極進攻', desc: '展現得分能力', diff: 3 },
+                            { label: 'C. 放手一搏', desc: '不顧一切打出名堂', diff: 5 }
+                        ] },
+                    { text: '學業與籃球如何平衡？', options: [
+                            { label: 'A. 專注籃球', desc: '全力投入訓練', diff: 3, academic: -3 },
+                            { label: 'B. 學業優先', desc: '確保成績', diff: 1, academic: 3 },
+                            { label: 'C. 兩者兼顧', desc: '合理分配時間', diff: 2, academic: 1 }
+                        ] },
+                    { text: '小B聯賽決賽，你最後一擊的選擇？', options: [
+                            { label: 'A. 突破上籃', desc: '穩妥取分', diff: 2 },
+                            { label: 'B. 三分絕殺', desc: '一球成名', diff: 4 },
+                            { label: 'C. 傳給隊友', desc: '相信團隊', diff: 1 }
+                        ] }
+                ],
+                // 中二 (小B聯賽)
+                [
+                    { text: '升上中二，你已成為球隊核心。你如何帶領球隊？', options: [
+                            { label: 'A. 以身作則', desc: '訓練最勤奮', diff: 2 },
+                            { label: 'B. 組織進攻', desc: '串聯隊友', diff: 3 },
+                            { label: 'C. 全力得分', desc: '場均20+', diff: 4 }
+                        ] },
+                    { text: '小B聯賽季後賽，關鍵一戰。你的心態？', options: [
+                            { label: 'A. 穩中求勝', desc: '減少失誤', diff: 2 },
+                            { label: 'B. 主動出擊', desc: '壓制對手', diff: 3 },
+                            { label: 'C. 放手一搏', desc: '挑戰極限', diff: 5 }
+                        ] },
+                    { text: '學業壓力增大，你如何取捨？', options: [
+                            { label: 'A. 籃球優先', desc: '全力衝擊', diff: 3, academic: -3 },
+                            { label: 'B. 學業平衡', desc: '保持成績', diff: 1, academic: 2 },
+                            { label: 'C. 兩者兼顧', desc: '付出更多時間', diff: 2, academic: 1 }
+                        ] }
+                ],
+                // 中四 (大B聯賽)
+                [
+                    { text: '大B聯賽揭幕戰，你面對更強對手。你的策略？', options: [
+                            { label: 'A. 團隊籃球', desc: '多傳球找機會', diff: 2 },
+                            { label: 'B. 個人單打', desc: '用實力碾壓', diff: 3 },
+                            { label: 'C. 放手一搏', desc: '挑戰對手王牌', diff: 5 }
+                        ] },
+                    { text: '大B聯賽冠軍爭奪，你如何應對？', options: [
+                            { label: 'A. 穩健發揮', desc: '不犯錯', diff: 2 },
+                            { label: 'B. 接管比賽', desc: '承擔責任', diff: 3 },
+                            { label: 'C. 放手一搏', desc: '創造奇蹟', diff: 5 }
+                        ] },
+                    { text: '學校對你期望極高，你如何回應？', options: [
+                            { label: 'A. 加倍訓練', desc: '用汗水回應', diff: 2 },
+                            { label: 'B. 冷靜應對', desc: '不被壓力影響', diff: 1 },
+                            { label: 'C. 激情宣言', desc: '承諾冠軍', diff: 4 }
+                        ] }
+                ],
+                // 中五 (Agrade聯賽)
+                [
+                    { text: 'Agrade聯賽，你面對頂級對手。你的策略？', options: [
+                            { label: 'A. 團隊籃球', desc: '多傳球找機會', diff: 2 },
+                            { label: 'B. 個人單打', desc: '用實力碾壓', diff: 3 },
+                            { label: 'C. 放手一搏', desc: '挑戰對手王牌', diff: 5 }
+                        ] },
+                    { text: '精英賽資格爭奪，你如何應對？', options: [
+                            { label: 'A. 穩健發揮', desc: '不犯錯', diff: 2 },
+                            { label: 'B. 接管比賽', desc: '承擔責任', diff: 3 },
+                            { label: 'C. 放手一搏', desc: '創造奇蹟', diff: 5 }
+                        ] },
+                    { text: '學業壓力與籃球巔峰，你如何取捨？', options: [
+                            { label: 'A. 籃球優先', desc: '全力衝擊', diff: 3, academic: -3 },
+                            { label: 'B. 學業平衡', desc: '保持成績', diff: 1, academic: 2 },
+                            { label: 'C. 兩者兼顧', desc: '付出更多時間', diff: 2, academic: 1 }
+                        ] }
+                ],
+                // 中六
+                [
+                    { text: '中六最後一季，你如何告別學界？', options: [
+                            { label: 'A. 完美收官', desc: '全勝奪冠', diff: 3 },
+                            { label: 'B. 傾盡所有', desc: '不留遺憾', diff: 2 },
+                            { label: 'C. 放手一搏', desc: '打破學界紀錄', diff: 5 }
+                        ] },
+                    { text: '大學/職業出路抉擇，你如何準備？', options: [
+                            { label: 'A. 專注籃球', desc: '全力備戰選秀', diff: 3, academic: -3 },
+                            { label: 'B. 學業為重', desc: '考好DSE', diff: 1, academic: 3 },
+                            { label: 'C. 兩者並進', desc: '籃球學業兼顧', diff: 2, academic: 1 }
+                        ] },
+                    { text: '學界明星賽，你希望留下什麼？', options: [
+                            { label: 'A. 團隊勝利', desc: '帶領球隊贏波', diff: 2 },
+                            { label: 'B. 個人榮譽', desc: '爭取MVP', diff: 3 },
+                            { label: 'C. 經典時刻', desc: '創造難忘回憶', diff: 4 }
+                        ] }
+                ]
+            ];
+            // 中六之後使用最後一組
+            if (year >= 4) return base[4] || base[base.length - 1];
+            return base[year] || base[0];
+        }
+
+        function handleAnswer(optIdx) {
+            if (G.answered) return;
+            G.answered = true;
+            G.selectedOption = optIdx;
+
+            const year = G.year;
+            const questions = getQuestionsForYear(year);
+            const qIdx = G.questionIndex;
+            if (qIdx >= questions.length) return;
+            const q = questions[qIdx];
+            const opt = q.options[optIdx];
+
+            checkInjury();
+            const dice = rand(1, 6);
+            const diff = opt.diff || 2;
+            let good = false,
+                bad = false,
+                effect = 0,
+                resultText = '';
+
+            if (dice >= 5) { good = true;
+                effect = Math.round((diff * 2.2 + rand(0, 3)) * 0.7);
+                resultText = pick(['表現出色！', '實力提升！', '贏得全場喝彩！']); } else if (dice >= 3) { good = false;
+                bad = false;
+                effect = rand(0, 2);
+                resultText = pick(['表現平穩', '逐漸適應']); } else { bad = true;
+                effect = -Math.round((diff * 2 + rand(0, 3)) * 0.6);
+                resultText = pick(['表現不佳', '遇到挫折']); }
+
+            effect = clamp(effect, -6, 8);
+            const affected = shuffle([...ATTR_KEYS]).slice(0, 2);
+            const changes = [];
+            for (let k of affected) {
+                const change = Math.round(effect / 2 * (0.8 + Math.random() * 0.4));
+                const actual = clamp(change, -5, 6);
+                G.attributes[k] = clamp(G.attributes[k] + actual, 20, 99);
+                changes.push({ label: getAttrLabel(k), val: actual });
+            }
+            const academicChange = opt.academic || 0;
+            if (academicChange !== 0) {
+                G.academic = clamp(G.academic + academicChange, 0, 100);
+                changes.push({ label: '學業', val: academicChange });
+            }
+            if (G.injury && !G.injury.treated) {
+                G.attributes.condition = clamp(G.attributes.condition - rand(1, 3), 20, 99);
+                changes.push({ label: '體能(傷病)', val: -rand(1, 3) });
+            }
+            G.overall = calcOverall(G.attributes);
+            G.lastResult = { dice, good, bad, text: resultText, changes, optIdx };
+            if (good && dice === 6) {
+                G.careerHighlights.push(`${getShortGrade(year)} 高光！`);
+            }
+            renderGame();
+        }
+
+        function renderHighSchool(container) {
+            const year = G.year;
+            const qIdx = G.questionIndex;
+            const questions = getQuestionsForYear(year);
+            const totalQ = questions.length;
+            if (qIdx >= totalQ) {
+                // 檢查精英賽/耐高觸發
+                const hasElite = G.seasonStats.some(s => s.elite);
+                if (hasElite && year >= 2 && !G.extraQuestionsActive) {
+                    G.extraQuestionsActive = true;
+                    G.extraQuestionsType = 'elite';
+                    G.extraQuestionsRemaining = 5;
+                    G.answered = false;
+                    renderGame();
+                    return;
+                }
+                const eliteChamp = G.seasonStats.some(s => s.eliteChampion);
+                const eliteRunner = G.seasonStats.some(s => s.eliteRunnerUp);
+                if ((eliteChamp || eliteRunner) && year >= 2 && !G.extraQuestionsActive) {
+                    G.extraQuestionsActive = true;
+                    G.extraQuestionsType = 'naigao';
+                    G.extraQuestionsRemaining = 5;
+                    G.answered = false;
+                    renderGame();
+                    return;
+                }
+                // 香港隊邀請 (機率提升20%)
+                if (G.overall >= 45 && !G.nationalGamesU19 && year >= 1 && !G.extraQuestionsActive) {
+                    // 基礎機率 + 20%
+                    let chance = 25 + 20; // 原25% + 20%
+                    if (G.overall >= 60) chance += 15;
+                    if (G.overall >= 70) chance += 15;
+                    if (rand(1, 100) <= chance) {
+                        showNationalU19Invite(container);
+                        return;
+                    }
+                }
+                if (G.overall >= 40 && !G.developmentTeam && year >= 1 && !G.extraQuestionsActive) {
+                    let chance = 30 + 20;
+                    if (G.overall >= 55) chance += 15;
+                    if (rand(1, 100) <= chance) {
+                        G.developmentTeam = true;
+                        G.careerAwards.push('香港發展隊');
+                        G.timeline.push({ year: getShortGrade(year), text: '入選香港發展隊', period: '學生' });
+                        showNotification('📌 你入選了香港發展隊！');
+                    }
+                }
+                renderSeasonEnd(container);
+                return;
+            }
+            const q = questions[qIdx];
+            const grade = getGradeName(year);
+            const age = getCurrentAge();
+            const league = year < 2 ? '小B聯賽' : (year === 2 ? '大B聯賽' : (year === 3 ? 'Agrade聯賽' : 'D1學界'));
+
+            let injuryHtml = '';
+            if (G.injury && !G.injury.treated) {
+                injuryHtml = `
+                    <div class="injury-box">
+                        <p>🩹 你受傷了：<strong>${G.injury.name}</strong>（嚴重度 ${G.injury.severity}）</p>
+                        <p>治療費用：${G.injury.cost} 萬 | 預計休養 ${G.injury.days} 天</p>
+                        <button class="btn btn-success" id="btnTreatInjury">💊 治療（${G.injury.cost}萬）</button>
+                    </div>
+                `;
+            }
+
+            let html = `
+                <div class="year-display">
+                    <div class="year">📅 <span class="highlight">${grade}</span> · ${age}歲 · ${league}</div>
+                    <div class="progress">問題 ${qIdx+1}/${totalQ}</div>
+                </div>
+                ${injuryHtml}
+                <div class="question-box">
+                    <div class="q-text">${q.text}</div>
+                </div>
+                <div class="options">
+            `;
+            const labels = ['A', 'B', 'C'];
+            q.options.forEach((opt, idx) => {
+                const disabled = G.answered ? 'disabled' : '';
+                const selected = G.answered && G.selectedOption === idx ? 'selected' : '';
+                html += `
+                    <button class="option-btn ${selected}" data-optidx="${idx}" ${disabled}>
+                        <span class="tag">${labels[idx]}</span>
+                        <span><strong>${opt.label}</strong> — ${opt.desc}</span>
+                    </button>
+                `;
+            });
+            html += `</div>`;
+
+            if (G.answered) {
+                const res = G.lastResult;
+                const diceEmoji = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'][res.dice - 1] || '🎲';
+                const statusClass = res.good ? 'positive' : (res.bad ? 'negative' : 'neutral');
+                const statusText = res.good ? '✅ 成功！' : (res.bad ? '❌ 失敗...' : '⚖️ 平穩');
+                html += `
+                    <div class="result-box">
+                        <div class="dice">${diceEmoji}</div>
+                        <div class="result-text"><span class="${statusClass}">${statusText}</span><br>${res.text}</div>
+                        <div class="stat-change">${res.changes.map(c => `<span class="${c.val>0?'up':'down'}">${c.label} ${c.val>0?'+':''}${c.val}</span>`).join('')}</div>
+                    </div>
+                    <button class="btn btn-primary btn-block" id="btnNextQuestion">➡️ 下一個事件</button>
+                `;
+            }
+
+            container.innerHTML = html;
+
+            if (G.injury && !G.injury.treated) {
+                document.getElementById('btnTreatInjury')?.addEventListener('click', () => {
+                    if (treatInjury()) renderGame();
+                });
+            }
+
+            if (!G.answered) {
+                container.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = parseInt(this.dataset.optidx);
+                        handleAnswer(idx);
+                    });
+                });
+            } else {
+                const nextBtn = document.getElementById('btnNextQuestion');
+                if (nextBtn) nextBtn.addEventListener('click', () => {
+                    G.answered = false;
+                    G.questionIndex++;
+                    renderGame();
+                });
+            }
+            updateHeader();
+        }
+
+        // ================================================================
+        //  賽季結束 (含比賽數據)
+        // ================================================================
+        function renderSeasonEnd(container, forceGraduation = false) {
+            const year = G.year;
+            const grade = getGradeName(year);
+            const nextGrade = getGradeName(year + 1);
+            const isLastYear = year >= 4 || forceGraduation;
+
+            const overall = G.overall;
+            const ppg = Math.round((overall / 10 + rand(0, 5)) * 10) / 10;
+            const rpg = Math.round((overall / 15 + rand(0, 2.5)) * 10) / 10;
+            const apg = Math.round((overall / 20 + rand(0, 1.8)) * 10) / 10;
+            const eliteQualify = overall >= 48;
+
+            // 生成賽季比賽
+            const matches = generateSeasonMatches(year, ppg, rpg, apg, overall);
+            G.seasonMatches = matches;
+
+            let pointsEarned = 0;
+            if (eliteQualify) pointsEarned += 2;
+            pointsEarned += rand(1, 2);
+            if (overall >= 70) pointsEarned += 1;
+            // 提高升總評方法：額外獎勵
+            if (ppg >= 20) pointsEarned += 1;
+            if (rpg >= 10) pointsEarned += 1;
+            if (apg >= 6) pointsEarned += 1;
+            G.availablePoints += pointsEarned;
+
+            if (G.injury && G.injury.treated) G.injury = null;
+
+            const season = { year: grade, ppg, rpg, apg, elite: eliteQualify, awards: [], eliteChampion: false,
+                eliteRunnerUp: false, naiGao: false, matches };
+            if (ppg >= 20 && overall >= 68) season.awards.push('學界MVP');
+            if (ppg >= 17 && eliteQualify) season.awards.push('精英賽最佳陣容');
+            if (year >= 3 && overall >= 72) season.awards.push('全港學界明星');
+            if (overall >= 62 && year >= 1) season.awards.push('學界明星賽入選');
+            G.seasonStats.push(season);
+            G.careerAwards.push(...season.awards);
+
+            G.totalGames += 18;
+            G.totalPoints += Math.round(ppg * 18);
+            G.totalAssists += Math.round(apg * 18);
+            G.totalRebounds += Math.round(rpg * 18);
+            G.timeline.push({ year: grade, text: `${grade} 場均 ${ppg}分 ${rpg}板 ${apg}助 ${eliteQualify ? '晉級精英賽' : ''}`,
+                period: '學生' });
+
+            // 香港隊入選機率提升20%
+            if (overall >= 55 && !G.hkTeam && rand(1, 100) <= 35 + 20) {
+                G.hkTeam = true;
+                G.hkTeamYear = grade;
+                G.careerAwards.push('香港代表隊');
+                G.timeline.push({ year: grade, text: '首次入選香港代表隊！', period: '學生' });
+                // 觸發額外問題
+                if (!G.hkTeamExtraActive) {
+                    G.hkTeamExtraActive = true;
+                    G.hkTeamExtraQuestions = 5;
+                    G.answered = false;
+                }
+                showNotification('🇭🇰 恭喜入選香港代表隊！');
+            }
+
+            if (overall >= 48 && !G.developmentTeam && rand(1, 100) <= 45 + 20) {
+                G.developmentTeam = true;
+                G.careerAwards.push('香港發展隊');
+                G.timeline.push({ year: grade, text: '入選香港發展隊', period: '學生' });
+                showNotification('📌 你入選了香港發展隊！');
+            }
+
+            const threads = generateThreads(grade, ppg, rpg, apg, overall, eliteQualify);
+
+            // 比賽數據展示
+            let matchHtml = '';
+            if (matches.length > 0) {
+                matchHtml = `
+                    <div style="margin:8px 0;">
+                        <p style="font-weight:700;color:#ffa500;">📋 賽季比賽</p>
+                        <div class="match-list">
+                            ${matches.map((m, idx) => `
+                                <div class="match-item" data-idx="${idx}">
+                                    <span>${m.opponent}</span>
+                                    <span class="score">${m.pts} - ${m.oppPts}</span>
+                                </div>
+                                <div class="match-detail" id="matchDetail_${idx}">
+                                    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;font-size:12px;color:#aabbdd;">
+                                        <div>得分: <strong style="color:#ffd740;">${m.playerPts}</strong></div>
+                                        <div>籃板: <strong style="color:#ffd740;">${m.playerReb}</strong></div>
+                                        <div>助攻: <strong style="color:#ffd740;">${m.playerAst}</strong></div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            let html = `
+                <div class="season-end">
+                    <h3 style="color:#ffa500;text-align:center;">🏆 ${grade} 賽季結束</h3>
+                    <div class="season-summary">
+                        <p><strong>📊 賽季數據</strong></p>
+                        <p><span class="stat-big">🏀 ${ppg}</span> 分 &nbsp;|&nbsp; <span class="stat-big">📥 ${rpg}</span> 板 &nbsp;|&nbsp; <span class="stat-big">🎯 ${apg}</span> 助</p>
+                        <p>${eliteQualify ? '✅ 成功晉級精英賽！' : '❌ 未能晉級精英賽'}</p>
+                        ${season.awards.length ? `<p>🏅 獎項：${season.awards.join('、')}</p>` : ''}
+                        <hr style="border-color:rgba(255,255,255,0.1);margin:6px 0;">
+                        <p>🔥 總評：${overall}</p>
+                        <p>📖 學業表現：${Math.round(G.academic)}</p>
+                        <p>🎁 獲得 <strong style="color:#ffd740;">${pointsEarned}</strong> 個分值！</p>
+                        <p>💰 目前資金：${G.money.toFixed(1)} 萬</p>
+                    </div>
+                    ${matchHtml}
+                    <div class="threads-box">
+                        <p style="color:#ffa500;font-weight:600;">💬 Threads 上的反應</p>
+                        ${threads.map(t => `<div class="thread"><span class="user">@${t.user}</span> ${t.text}</div>`).join('')}
+                    </div>
+            `;
+
+            // 點擊比賽顯示詳情
+            setTimeout(() => {
+                document.querySelectorAll('.match-item').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const idx = this.dataset.idx;
+                        const detail = document.getElementById(`matchDetail_${idx}`);
+                        if (detail) {
+                            detail.classList.toggle('show');
+                        }
+                    });
+                });
+            }, 50);
+
+            if (!isLastYear) {
+                const isTransition = year === 1;
+                if (isTransition) {
+                    html += `<button class="btn btn-primary btn-block mt-10" id="btnChooseHighSchool">🏫 選擇高中學校</button>`;
+                } else {
+                    html += `<button class="btn btn-primary btn-block mt-10" id="btnNextSeason">➡️ 進入 ${nextGrade}</button>`;
+                }
+            } else {
+                html += `
+                    <div style="background:rgba(255,215,0,0.08);border-radius:16px;padding:12px;margin:12px 0;border:1px solid rgba(255,215,0,0.2);">
+                        <p style="font-size:18px;color:#ffd740;">🎓 高中畢業！</p>
+                        <p style="color:#aabbdd;">你的學界生涯結束，選擇你的未來：</p>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <button class="btn btn-primary btn-block" id="btnCheckNCAA">🇺🇸 查看 NCAA 機會</button>
+                        ${G.academic >= 22 ? `<button class="btn btn-secondary btn-block" id="btnGoCollege">🎓 升讀大專聯賽 (AUBL)</button>` : `<button class="btn btn-secondary btn-block" disabled style="opacity:0.5;">🎓 學業不足 (${Math.round(G.academic)}/22) 無法入讀大專</button>`}
+                        ${overall >= 48 ? `<button class="btn btn-success btn-block" id="btnGoPro">🏆 加入香港職業聯賽 (甲一/甲二 · 業餘)</button>` : `<button class="btn btn-secondary btn-block" disabled style="opacity:0.5;">🏆 總評不足 (${overall}/48) 無法進入職業</button>`}
+                        <button class="btn btn-danger btn-block" id="btnRetire">🔄 退役並結束生涯</button>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+
+            document.getElementById('btnChooseHighSchool')?.addEventListener('click', showSchoolChoice);
+            document.getElementById('btnNextSeason')?.addEventListener('click', () => {
+                G.year++;
+                G.questionIndex = 0;
+                G.answered = false;
+                G.distributed = false;
+                G.seasonMatches = [];
+                specialEventTriggered = false;
+                showDistributePage('新賽季能力分配');
+            });
+            document.getElementById('btnCheckNCAA')?.addEventListener('click', showNCAAChance);
+            document.getElementById('btnGoCollege')?.addEventListener('click', () => {
+                G.phase = 'college';
+                G.collegeTeam = pick(COLLEGE_TEAMS);
+                G.collegeYear = 0;
+                G.questionIndex = 0;
+                G.answered = false;
+                G.distributed = false;
+                G.timeline.push({ year: '大專', text: `入讀 ${G.collegeTeam} (AUBL)`, period: '學生' });
+                showDistributePage('大專能力分配');
+                updateHeader();
+            });
+            document.getElementById('btnGoPro')?.addEventListener('click', () => {
+                showTeamSelect('以下是對你感興趣的職業球隊（甲一/甲二屬業餘聯賽）：');
+            });
+            document.getElementById('btnRetire')?.addEventListener('click', () => {
+                G.retired = true;
+                G.retirementReason = '選擇退役，專注其他事業';
+                G.gameOver = true;
+                renderGame();
+            });
+            updateHeader();
+        }
+
+        // ================================================================
+        //  生成賽季比賽
+        // ================================================================
+        function generateSeasonMatches(year, ppg, rpg, apg, overall) {
+            const matches = [];
+            const teams = ['皇仁書院', '喇沙書院', '拔萃男書院', '英華書院', '聖若瑟書院', '真道書院', '寶覺中學', '桂華山中學', '協和書院', '張振興伉儷書院'];
+            const numMatches = 8 + rand(0, 4);
+            for (let i = 0; i < numMatches; i++) {
+                const opp = pick(teams);
+                const oppStrength = rand(40, 80);
+                const playerPts = Math.round((ppg * (0.6 + rand(0, 8) / 10)) * 10) / 10;
+                const playerReb = Math.round((rpg * (0.5 + rand(0, 8) / 10)) * 10) / 10;
+                const playerAst = Math.round((apg * (0.5 + rand(0, 8) / 10)) * 10) / 10;
+                const teamPts = Math.round(playerPts * (3 + rand(0, 5) / 10) + rand(10, 30));
+                const oppPts = Math.round(teamPts * (0.7 + rand(0, 6) / 10));
+                matches.push({
+                    opponent: opp,
+                    pts: teamPts,
+                    oppPts: oppPts,
+                    playerPts: playerPts,
+                    playerReb: playerReb,
+                    playerAst: playerAst,
+                    win: teamPts > oppPts
+                });
+            }
+            return matches;
+        }
+
+        // ================================================================
+        //  額外問題 (精英賽/耐高)
+        // ================================================================
+        function generateExtraQuestions(type, year) {
+            const base = [];
+            if (type === 'elite') {
+                for (let i = 0; i < 5; i++) {
+                    base.push({
+                        text: `精英賽關鍵戰役 (${i+1}/5)：你如何應對？`,
+                        options: [
+                            { label: 'A. 穩健打法', desc: '減少失誤', diff: 2, academic: 0 },
+                            { label: 'B. 全力進攻', desc: '接管比賽', diff: 3, academic: -1 },
+                            { label: 'C. 放手一搏', desc: '打出不講理表現', diff: 5, academic: -3 }
+                        ]
+                    });
+                }
+            } else if (type === 'naigao') {
+                for (let i = 0; i < 5; i++) {
+                    base.push({
+                        text: `耐高全國聯賽 (${i+1}/5)：面對全國強敵，你如何表現？`,
+                        options: [
+                            { label: 'A. 穩紮穩打', desc: '不犯錯', diff: 2, academic: 0 },
+                            { label: 'B. 展現天賦', desc: '用個人能力解決', diff: 3, academic: -1 },
+                            { label: 'C. 放手一搏', desc: '挑戰耐高紀錄', diff: 5, academic: -3 }
+                        ]
+                    });
+                }
+            }
+            return base;
+        }
+
+        function renderExtraQuestions(container) {
+            const type = G.extraQuestionsType;
+            const remaining = G.extraQuestionsRemaining;
+            const questions = generateExtraQuestions(type, G.year);
+            const localIdx = 5 - remaining;
+            if (localIdx >= questions.length) {
+                G.extraQuestionsActive = false;
+                G.extraQuestionsRemaining = 0;
+                G.answered = false;
+                G.questionIndex = 0;
+                renderGame();
+                return;
+            }
+            const q = questions[localIdx];
+            const league = type === 'elite' ? '精英賽' : '耐高聯賽';
+
+            let canPlay = true;
+            if (G.injury && !G.injury.treated) {
+                canPlay = rand(1, 100) <= 40;
+            } else if (G.injury && G.injury.treated) {
+                canPlay = rand(1, 100) <= 60;
+            }
+
+            let html = `
+                <div class="year-display">
+                    <div class="year">🏆 ${league} <span class="highlight">問題 ${localIdx+1}/${questions.length}</span></div>
+                    <div class="progress">剩餘 ${remaining} 題</div>
+                </div>
+            `;
+            if (!canPlay) {
+                html += `<div class="injury-box"><p>🩹 因傷病影響，本場無法全力出戰，表現受限。</p></div>`;
+            }
+            html += `
+                <div class="question-box">
+                    <div class="q-text">${q.text}</div>
+                </div>
+                <div class="options">
+            `;
+            const labels = ['A', 'B', 'C'];
+            q.options.forEach((opt, idx) => {
+                const disabled = G.answered ? 'disabled' : '';
+                const selected = G.answered && G.selectedOption === idx ? 'selected' : '';
+                html += `
+                    <button class="option-btn ${selected}" data-optidx="${idx}" ${disabled}>
+                        <span class="tag">${labels[idx]}</span>
+                        <span><strong>${opt.label}</strong> — ${opt.desc}</span>
+                    </button>
+                `;
+            });
+            html += `</div>`;
+
+            if (G.answered) {
+                const res = G.lastResult;
+                const diceEmoji = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'][res.dice - 1] || '🎲';
+                const statusClass = res.good ? 'positive' : (res.bad ? 'negative' : 'neutral');
+                const statusText = res.good ? '✅ 成功！' : (res.bad ? '❌ 失敗...' : '⚖️ 平穩');
+                html += `
+                    <div class="result-box">
+                        <div class="dice">${diceEmoji}</div>
+                        <div class="result-text"><span class="${statusClass}">${statusText}</span><br>${res.text}</div>
+                        <div class="stat-change">${res.changes.map(c => `<span class="${c.val>0?'up':'down'}">${c.label} ${c.val>0?'+':''}${c.val}</span>`).join('')}</div>
+                    </div>
+                    <button class="btn btn-primary btn-block" id="btnNextExtraQuestion">➡️ 下一個事件</button>
+                `;
+            }
+
+            container.innerHTML = html;
+
+            if (!G.answered) {
+                container.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = parseInt(this.dataset.optidx);
+                        handleExtraAnswer(idx, canPlay);
+                    });
+                });
+            } else {
+                const nextBtn = document.getElementById('btnNextExtraQuestion');
+                if (nextBtn) nextBtn.addEventListener('click', () => {
+                    G.answered = false;
+                    G.extraQuestionsRemaining--;
+                    renderGame();
+                });
+            }
+            updateHeader();
+        }
+
+        function handleExtraAnswer(optIdx, canPlay = true) {
+            if (G.answered) return;
+            G.answered = true;
+            G.selectedOption = optIdx;
+
+            const type = G.extraQuestionsType;
+            const questions = generateExtraQuestions(type, G.year);
+            const localIdx = 5 - G.extraQuestionsRemaining;
+            const q = questions[localIdx];
+            const opt = q.options[optIdx];
+            const dice = rand(1, 6);
+            const diff = opt.diff || 2;
+            let good = false,
+                bad = false,
+                effect = 0,
+                resultText = '';
+            if (dice >= 5) { good = true;
+                effect = Math.round((diff * 2.5 + rand(0, 3)) * 0.7);
+                resultText = pick(['表現出色！', '實力提升！', '贏得全場喝彩！']); } else if (dice >= 3) { good = false;
+                bad = false;
+                effect = rand(0, 2);
+                resultText = pick(['表現平穩', '逐漸適應']); } else { bad = true;
+                effect = -Math.round((diff * 2 + rand(0, 3)) * 0.6);
+                resultText = pick(['表現不佳', '遇到挫折']); }
+
+            if (!canPlay) effect = Math.round(effect * 0.4);
+            effect = clamp(effect, -5, 7);
+
+            const affected = shuffle([...ATTR_KEYS]).slice(0, 2);
+            const changes = [];
+            for (let k of affected) {
+                const change = Math.round(effect / 2 * (0.8 + Math.random() * 0.4));
+                const actual = clamp(change, -4, 5);
+                G.attributes[k] = clamp(G.attributes[k] + actual, 20, 99);
+                changes.push({ label: getAttrLabel(k), val: actual });
+            }
+            const academicChange = opt.academic || 0;
+            if (academicChange !== 0) {
+                G.academic = clamp(G.academic + academicChange, 0, 100);
+                changes.push({ label: '學業', val: academicChange });
+            }
+            G.overall = calcOverall(G.attributes);
+            G.lastResult = { dice, good, bad, text: resultText, changes, optIdx };
+            if (good && dice === 6) G.careerHighlights.push(`${type} 高光！`);
+
+            if (type === 'elite') {
+                if (localIdx === 4) {
+                    if (good) {
+                        G.seasonStats[G.seasonStats.length - 1].eliteChampion = true;
+                        G.careerAwards.push('精英賽冠軍');
+                    } else if (dice >= 3) {
+                        G.seasonStats[G.seasonStats.length - 1].eliteRunnerUp = true;
+                        G.careerAwards.push('精英賽亞軍');
+                    }
+                }
+            }
+            if (type === 'naigao' && localIdx === 4) {
+                G.naiGaoPlayed = true;
+                if (good) G.careerAwards.push('耐高全國冠軍');
+                else if (dice >= 3) G.careerAwards.push('耐高全國亞軍');
+            }
+
+            renderGame();
+        }
+
+        // ================================================================
+        //  U19 邀請
+        // ================================================================
+        function showNationalU19Invite(container) {
+            let html = `
+                <div class="season-end">
+                    <h3 style="color:#ffa500;text-align:center;">🇭🇰 全運會 U19 / 香港發展隊邀請</h3>
+                    <div class="season-summary">
+                        <p>你獲邀加入香港發展隊，參加全運會 U19 賽事！</p>
+                        <p>你的總評：${G.overall}</p>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <button class="btn btn-success" id="btnAcceptU19">✅ 接受邀請</button>
+                        <button class="btn btn-danger" id="btnDeclineU19">❌ 拒絕</button>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+
+            document.getElementById('btnAcceptU19').addEventListener('click', () => {
+                G.nationalGamesU19 = true;
+                G.allChinaGamesU19++;
+                G.developmentTeam = true;
+                G.careerAwards.push('全運會 U19 參賽');
+                G.careerAwards.push('香港發展隊');
+                G.timeline.push({ year: getShortGrade(G.year), text: '入選香港發展隊並參加全運會 U19', period: '學生' });
+                showNotification('🇭🇰 你已加入香港發展隊！');
+                G.attributes.condition = clamp(G.attributes.condition + 4, 20, 99);
+                G.overall = calcOverall(G.attributes);
+                G.extraQuestionsActive = false;
+                G.extraQuestionsRemaining = 0;
+                G.answered = false;
+                G.questionIndex = 0;
+                renderGame();
+            });
+            document.getElementById('btnDeclineU19').addEventListener('click', () => {
+                G.timeline.push({ year: getShortGrade(G.year), text: '拒絕全運會 U19 邀請', period: '學生' });
+                G.extraQuestionsActive = false;
+                G.extraQuestionsRemaining = 0;
+                G.answered = false;
+                G.questionIndex = 0;
+                renderGame();
+            });
+        }
+
+        // ================================================================
+        //  大專 (保持原樣，略簡化)
+        // ================================================================
+        function renderCollege(container) {
+            const year = G.collegeYear;
+            const totalQ = 3;
+            if (G.questionIndex >= totalQ) {
+                if (!G.nationalGamesAdult && G.overall >= 55 && G.collegeYear >= 1 && rand(1, 100) <= 40 + 20) {
+                    showNationalAdultInvite(container);
+                    return;
+                }
+                renderCollegeSeasonEnd(container);
+                return;
+            }
+
+            const questions = [
+                { text: '大專聯賽揭幕戰，你希望以什麼心態應戰？', options: [
+                        { label: 'A. 穩健為主', desc: '減少失誤，打好基礎', diff: 2 },
+                        { label: 'B. 積極進攻', desc: '展現個人能力', diff: 3 },
+                        { label: 'C. 放手一搏', desc: '挑戰大專紀錄', diff: 5 }
+                    ] },
+                { text: '學業與籃球平衡，你如何取捨？', options: [
+                        { label: 'A. 籃球優先', desc: '全力投入訓練', diff: 3, academic: -3 },
+                        { label: 'B. 學業優先', desc: '確保成績', diff: 1, academic: 3 },
+                        { label: 'C. 兩者兼顧', desc: '合理分配時間', diff: 2, academic: 1 }
+                    ] },
+                { text: '大專盃八強賽，你手感火燙。你該？', options: [
+                        { label: 'A. 繼續出手', desc: '乘勝追擊', diff: 3 },
+                        { label: 'B. 吸引防守', desc: '為隊友創造機會', diff: 1 },
+                        { label: 'C. 放手一搏', desc: '挑戰個人得分紀錄', diff: 5 }
+                    ] }
+            ];
+            const q = questions[G.questionIndex] || questions[0];
+
+            let html = `
+                <div class="year-display">
+                    <div class="year">🎓 大專聯賽 <span class="highlight">第 ${year+1} 年</span></div>
+                    <div class="progress">事件 ${G.questionIndex+1}/${totalQ}</div>
+                </div>
+                <div class="question-box">
+                    <div class="q-text">${q.text}</div>
+                </div>
+                <div class="options">
+            `;
+            const labels = ['A', 'B', 'C'];
+            q.options.forEach((opt, idx) => {
+                const disabled = G.answered ? 'disabled' : '';
+                const selected = G.answered && G.selectedOption === idx ? 'selected' : '';
+                html += `
+                    <button class="option-btn ${selected}" data-optidx="${idx}" ${disabled}>
+                        <span class="tag">${labels[idx]}</span>
+                        <span><strong>${opt.label}</strong> — ${opt.desc}</span>
+                    </button>
+                `;
+            });
+            html += `</div>`;
+
+            if (G.answered) {
+                const res = G.lastResult;
+                const diceEmoji = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'][res.dice - 1] || '🎲';
+                const statusClass = res.good ? 'positive' : (res.bad ? 'negative' : 'neutral');
+                const statusText = res.good ? '✅ 成功！' : (res.bad ? '❌ 失敗...' : '⚖️ 平穩');
+                html += `
+                    <div class="result-box">
+                        <div class="dice">${diceEmoji}</div>
+                        <div class="result-text"><span class="${statusClass}">${statusText}</span><br>${res.text}</div>
+                        <div class="stat-change">${res.changes.map(c => `<span class="${c.val>0?'up':'down'}">${c.label} ${c.val>0?'+':''}${c.val}</span>`).join('')}</div>
+                    </div>
+                    <button class="btn btn-primary btn-block" id="btnNextCollegeQuestion">➡️ 下一個事件</button>
+                `;
+            }
+
+            container.innerHTML = html;
+
+            if (!G.answered) {
+                container.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = parseInt(this.dataset.optidx);
+                        handleCollegeAnswer(idx);
+                    });
+                });
+            } else {
+                const nextBtn = document.getElementById('btnNextCollegeQuestion');
+                if (nextBtn) nextBtn.addEventListener('click', () => {
+                    G.answered = false;
+                    G.questionIndex++;
+                    renderGame();
+                });
+            }
+            updateHeader();
+        }
+
+        function handleCollegeAnswer(optIdx) {
+            if (G.answered) return;
+            G.answered = true;
+            G.selectedOption = optIdx;
+            const questions = [
+                { text: '大專聯賽揭幕戰，你希望以什麼心態應戰？', options: [
+                        { label: 'A. 穩健為主', desc: '減少失誤，打好基礎', diff: 2 },
+                        { label: 'B. 積極進攻', desc: '展現個人能力', diff: 3 },
+                        { label: 'C. 放手一搏', desc: '挑戰大專紀錄', diff: 5 }
+                    ] },
+                { text: '學業與籃球平衡，你如何取捨？', options: [
+                        { label: 'A. 籃球優先', desc: '全力投入訓練', diff: 3, academic: -3 },
+                        { label: 'B. 學業優先', desc: '確保成績', diff: 1, academic: 3 },
+                        { label: 'C. 兩者兼顧', desc: '合理分配時間', diff: 2, academic: 1 }
+                    ] },
+                { text: '大專盃八強賽，你手感火燙。你該？', options: [
+                        { label: 'A. 繼續出手', desc: '乘勝追擊', diff: 3 },
+                        { label: 'B. 吸引防守', desc: '為隊友創造機會', diff: 1 },
+                        { label: 'C. 放手一搏', desc: '挑戰個人得分紀錄', diff: 5 }
+                    ] }
+            ];
+            const q = questions[G.questionIndex] || questions[0];
+            const opt = q.options[optIdx];
+            const dice = rand(1, 6);
+            const diff = opt.diff || 2;
+            let good = false,
+                bad = false,
+                effect = 0,
+                resultText = '';
+            if (dice >= 5) { good = true;
+                effect = Math.round((diff * 2.5 + rand(0, 3)) * 0.7);
+                resultText = pick(['表現出色！', '實力提升！', '贏得全場喝彩！']); } else if (dice >= 3) { good = false;
+                bad = false;
+                effect = rand(0, 2);
+                resultText = pick(['表現平穩', '逐漸適應大專節奏']); } else { bad = true;
+                effect = -Math.round((diff * 2 + rand(0, 3)) * 0.55);
+                resultText = pick(['表現不佳', '遇到挫折']); }
+
+            effect = clamp(effect, -5, 7);
+            const affected = shuffle([...ATTR_KEYS]).slice(0, 2);
+            const changes = [];
+            for (let k of affected) {
+                const change = Math.round(effect / 2 * (0.8 + Math.random() * 0.4));
+                const actual = clamp(change, -4, 5);
+                G.attributes[k] = clamp(G.attributes[k] + actual, 20, 99);
+                changes.push({ label: getAttrLabel(k), val: actual });
+            }
+            const academicChange = opt.academic || 0;
+            if (academicChange !== 0) {
+                G.academic = clamp(G.academic + academicChange, 0, 100);
+                changes.push({ label: '學業', val: academicChange });
+            }
+            G.overall = calcOverall(G.attributes);
+            G.lastResult = { dice, good, bad, text: resultText, changes, optIdx };
+            if (good && dice === 6) G.careerHighlights.push(`大專第${G.collegeYear+1}年 高光！`);
+            renderGame();
+        }
+
+        function renderCollegeSeasonEnd(container) {
+            const year = G.collegeYear;
+            const overall = G.overall;
+            const ppg = Math.round((overall / 10 + rand(0, 5)) * 10) / 10;
+            const rpg = Math.round((overall / 15 + rand(0, 2.5)) * 10) / 10;
+            const apg = Math.round((overall / 20 + rand(0, 2)) * 10) / 10;
+            const champion = rand(1, 8) <= 1;
+            const mvp = champion && rand(1, 3) === 1;
+
+            const stat = { year: year + 1, ppg, rpg, apg, champion, mvp };
+            G.collegeStats.push(stat);
+            if (champion) G.careerAwards.push('大專聯賽冠軍');
+            if (mvp) G.careerAwards.push('大專MVP');
+            if (overall >= 65) G.careerAwards.push('大專明星賽入選');
+
+            G.totalGames += 22;
+            G.totalPoints += Math.round(ppg * 22);
+            G.totalAssists += Math.round(apg * 22);
+            G.totalRebounds += Math.round(rpg * 22);
+            G.timeline.push({ year: `大專第${year+1}年`, text: `場均 ${ppg}分 ${rpg}板 ${apg}助 ${champion?'🏆奪冠':''}`,
+                period: '學生' });
+
+            let pointsEarned = 2 + rand(1, 2);
+            if (champion) pointsEarned += 2;
+            if (mvp) pointsEarned += 3;
+            G.availablePoints += pointsEarned;
+
+            let html = `
+                <div class="season-end">
+                    <h3 style="color:#ffa500;text-align:center;">🎓 大專聯賽 第 ${year+1} 年 結束</h3>
+                    <div class="season-summary">
+                        <p><strong>📊 大專數據</strong></p>
+                        <p><span class="stat-big">🏀 ${ppg}</span> 分 &nbsp;|&nbsp; <span class="stat-big">📥 ${rpg}</span> 板 &nbsp;|&nbsp; <span class="stat-big">🎯 ${apg}</span> 助</p>
+                        <p>${champion ? '🏆 奪得大專聯賽冠軍！' : '❌ 未能奪冠'}</p>
+                        <p>${mvp ? '🏅 榮獲大專MVP！' : ''}</p>
+                        <p>🔥 總評：${overall}</p>
+                        <p>🎁 獲得 <strong style="color:#ffd740;">${pointsEarned}</strong> 個分值！</p>
+                    </div>
+            `;
+
+            if (G.collegeYear < 3) {
+                html += `
+                    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+                        <button class="btn btn-primary btn-block" id="btnNextCollegeYear">➡️ 進入大專第 ${year+2} 年</button>
+                        <button class="btn btn-danger btn-block" id="btnCollegeDropout">🚪 退學</button>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div style="background:rgba(255,215,0,0.08);border-radius:16px;padding:12px;margin:12px 0;border:1px solid rgba(255,215,0,0.2);">
+                        <p style="font-size:18px;color:#ffd740;">🎓 大專畢業！</p>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <button class="btn btn-success btn-block" id="btnCollegeToPro">🏆 進入職業聯賽</button>
+                        <button class="btn btn-danger btn-block" id="btnRetireCollege">退役</button>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+
+            document.getElementById('btnNextCollegeYear')?.addEventListener('click', () => {
+                G.collegeYear++;
+                G.questionIndex = 0;
+                G.answered = false;
+                G.distributed = false;
+                showDistributePage('大專能力分配');
+                updateHeader();
+            });
+            document.getElementById('btnCollegeDropout')?.addEventListener('click', () => {
+                G.timeline.push({ year: `大專第${year+1}年`, text: '決定退學', period: '學生' });
+                if (G.overall >= 45) {
+                    showTeamSelect('你決定退學，以下職業球隊對你感興趣：');
+                } else {
+                    G.retired = true;
+                    G.retirementReason = '退學後未能進入職業';
+                    G.gameOver = true;
+                    renderGame();
+                }
+            });
+            document.getElementById('btnCollegeToPro')?.addEventListener('click', () => {
+                showTeamSelect('大專畢業，以下職業球隊對你感興趣：');
+            });
+            document.getElementById('btnRetireCollege')?.addEventListener('click', () => {
+                G.retired = true;
+                G.retirementReason = '大專畢業後退役';
+                G.gameOver = true;
+                renderGame();
+            });
+            updateHeader();
+        }
+
+        function showNationalAdultInvite(container) {
+            let html = `
+                <div class="season-end">
+                    <h3 style="color:#ffa500;text-align:center;">🇭🇰 全運會成年代表隊邀請</h3>
+                    <div class="season-summary">
+                        <p>你獲邀加入香港代表隊，參加全運會成年組賽事！</p>
+                        <p>你的總評：${G.overall}</p>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <button class="btn btn-success" id="btnAcceptAdult">✅ 接受邀請</button>
+                        <button class="btn btn-danger" id="btnDeclineAdult">❌ 拒絕</button>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+
+            document.getElementById('btnAcceptAdult').addEventListener('click', () => {
+                G.nationalGamesAdult = true;
+                G.allChinaGamesAdult++;
+                G.hkTeam = true;
+                G.careerAwards.push('全運會成年組參賽');
+                G.careerAwards.push('香港代表隊');
+                G.timeline.push({ year: `職業`, text: '參加全運會成年組並入選香港代表隊', period: '業餘' });
+                // 觸發額外問題
+                if (!G.hkTeamExtraActive) {
+                    G.hkTeamExtraActive = true;
+                    G.hkTeamExtraQuestions = 5;
+                    G.answered = false;
+                }
+                showNotification('🇭🇰 你已加入香港代表隊！');
+                G.attributes.condition = clamp(G.attributes.condition + 3, 20, 99);
+                G.overall = calcOverall(G.attributes);
+                G.answered = false;
+                G.questionIndex = 0;
+                renderGame();
+            });
+            document.getElementById('btnDeclineAdult').addEventListener('click', () => {
+                G.timeline.push({ year: `職業`, text: '拒絕全運會成年組邀請', period: '業餘' });
+                G.answered = false;
+                G.questionIndex = 0;
+                renderGame();
+            });
+        }
+
+        // ================================================================
+        //  NCAA (保持原樣)
+        // ================================================================
+        function renderNCAA(container) {
+            const year = G.ncaaYear;
+            const totalQ = 3;
+            if (G.questionIndex >= totalQ) {
+                renderNCAASeasonEnd(container);
+                return;
+            }
+
+            const questions = [
+                { text: 'NCAA 賽季開始，你希望扮演什麼角色？', options: [
+                        { label: 'A. 得分主力', desc: '承擔進攻責任', diff: 3 },
+                        { label: 'B. 防守大鎖', desc: '專注限制對方王牌', diff: 2 },
+                        { label: 'C. 放手一搏', desc: '挑戰全明星級表現', diff: 5 }
+                    ] },
+                { text: '教練要求你增加體能訓練，你會？', options: [
+                        { label: 'A. 全力配合', desc: '提升體能', diff: 2 },
+                        { label: 'B. 適度配合', desc: '平衡訓練', diff: 1 },
+                        { label: 'C. 專注技術', desc: '把時間用在投籃', diff: 3 }
+                    ] },
+                { text: '重要比賽，你手感火燙。你該？', options: [
+                        { label: 'A. 繼續出手', desc: '乘勝追擊', diff: 3 },
+                        { label: 'B. 吸引防守', desc: '為隊友創造機會', diff: 1 },
+                        { label: 'C. 放手一搏', desc: '挑戰個人得分紀錄', diff: 5 }
+                    ] }
+            ];
+            const q = questions[G.questionIndex] || questions[0];
+
+            let html = `
+                <div class="year-display">
+                    <div class="year">🇺🇸 NCAA ${G.ncaaLevel} <span class="highlight">第 ${year+1} 年</span> · ${G.ncaaTeam}</div>
+                    <div class="progress">事件 ${G.questionIndex+1}/${totalQ}</div>
+                </div>
+                <div class="question-box">
+                    <div class="q-text">${q.text}</div>
+                </div>
+                <div class="options">
+            `;
+            const labels = ['A', 'B', 'C'];
+            q.options.forEach((opt, idx) => {
+                const disabled = G.answered ? 'disabled' : '';
+                const selected = G.answered && G.selectedOption === idx ? 'selected' : '';
+                html += `
+                    <button class="option-btn ${selected}" data-optidx="${idx}" ${disabled}>
+                        <span class="tag">${labels[idx]}</span>
+                        <span><strong>${opt.label}</strong> — ${opt.desc}</span>
+                    </button>
+                `;
+            });
+            html += `</div>`;
+
+            if (G.answered) {
+                const res = G.lastResult;
+                const diceEmoji = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'][res.dice - 1] || '🎲';
+                const statusClass = res.good ? 'positive' : (res.bad ? 'negative' : 'neutral');
+                const statusText = res.good ? '✅ 成功！' : (res.bad ? '❌ 失敗...' : '⚖️ 平穩');
+                html += `
+                    <div class="result-box">
+                        <div class="dice">${diceEmoji}</div>
+                        <div class="result-text"><span class="${statusClass}">${statusText}</span><br>${res.text}</div>
+                        <div class="stat-change">${res.changes.map(c => `<span class="${c.val>0?'up':'down'}">${c.label} ${c.val>0?'+':''}${c.val}</span>`).join('')}</div>
+                    </div>
+                    <button class="btn btn-primary btn-block" id="btnNextNCAAQuestion">➡️ 下一個事件</button>
+                `;
+            }
+
+            container.innerHTML = html;
+
+            if (!G.answered) {
+                container.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = parseInt(this.dataset.optidx);
+                        handleNCAAAnswer(idx);
+                    });
+                });
+            } else {
+                const nextBtn = document.getElementById('btnNextNCAAQuestion');
+                if (nextBtn) nextBtn.addEventListener('click', () => {
+                    G.answered = false;
+                    G.questionIndex++;
+                    renderGame();
+                });
+            }
+            updateHeader();
+        }
+
+        function handleNCAAAnswer(optIdx) {
+            if (G.answered) return;
+            G.answered = true;
+            G.selectedOption = optIdx;
+            const dice = rand(1, 6);
+            const diff = 3;
+            let good = false,
+                bad = false,
+                effect = 0,
+                resultText = '';
+            if (dice >= 5) { good = true;
+                effect = Math.round((diff * 2.8 + rand(0, 3)) * 0.75);
+                resultText = pick(['在NCAA打出名堂！', '表現出色！', '贏得球迷喝彩！']); } else if (dice >= 3) { good = false;
+                bad = false;
+                effect = rand(0, 2);
+                resultText = pick(['表現平穩', '逐漸適應NCAA節奏']); } else { bad = true;
+                effect = -Math.round((diff * 2 + rand(0, 3)) * 0.55);
+                resultText = pick(['遇到撞牆期', '被對手壓制']); }
+
+            effect = clamp(effect, -5, 8);
+            const affected = shuffle([...ATTR_KEYS]).slice(0, 2);
+            const changes = [];
+            for (let k of affected) {
+                const change = Math.round(effect / 2 * (0.8 + Math.random() * 0.4));
+                const actual = clamp(change, -4, 6);
+                G.attributes[k] = clamp(G.attributes[k] + actual, 20, 99);
+                changes.push({ label: getAttrLabel(k), val: actual });
+            }
+            G.overall = calcOverall(G.attributes);
+            G.lastResult = { dice, good, bad, text: resultText, changes, optIdx };
+            if (good && dice === 6) G.careerHighlights.push(`NCAA第${G.ncaaYear+1}年 高光！`);
+            renderGame();
+        }
+
+        function renderNCAASeasonEnd(container) {
+            const year = G.ncaaYear;
+            const overall = G.overall;
+            const ppg = Math.round((overall / 9 + rand(0, 6)) * 10) / 10;
+            const rpg = Math.round((overall / 13 + rand(0, 3)) * 10) / 10;
+            const apg = Math.round((overall / 17 + rand(0, 2.5)) * 10) / 10;
+            const allConference = overall >= 70 && rand(1, 3) === 1;
+
+            G.totalGames += 28;
+            G.totalPoints += Math.round(ppg * 28);
+            G.totalAssists += Math.round(apg * 28);
+            G.totalRebounds += Math.round(rpg * 28);
+            G.timeline.push({ year: `NCAA第${year+1}年`, text: `場均 ${ppg}分 ${rpg}板 ${apg}助 ${allConference?'全聯盟陣容':''}`,
+                period: '學生' });
+
+            let pointsEarned = 2 + rand(1, 2);
+            if (allConference) pointsEarned += 3;
+            G.availablePoints += pointsEarned;
+
+            let html = `
+                <div class="season-end">
+                    <h3 style="color:#ffa500;text-align:center;">🇺🇸 NCAA ${G.ncaaLevel} 第 ${year+1} 年 結束</h3>
+                    <div class="season-summary">
+                        <p><strong>📊 NCAA 數據</strong></p>
+                        <p><span class="stat-big">🏀 ${ppg}</span> 分 &nbsp;|&nbsp; <span class="stat-big">📥 ${rpg}</span> 板 &nbsp;|&nbsp; <span class="stat-big">🎯 ${apg}</span> 助</p>
+                        <p>${allConference ? '🏅 入選全聯盟陣容！' : ''}</p>
+                        <p>🔥 總評：${overall}</p>
+                        <p>🎁 獲得 <strong style="color:#ffd740;">${pointsEarned}</strong> 個分值！</p>
+                    </div>
+            `;
+
+            if (G.ncaaYear < 3) {
+                html += `
+                    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+                        <button class="btn btn-primary btn-block" id="btnNextNCAAYear">➡️ 進入 NCAA 第 ${year+2} 年</button>
+                        <button class="btn btn-danger btn-block" id="btnLeaveNCAA">🚪 離開 NCAA，返回香港</button>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div style="background:rgba(255,215,0,0.08);border-radius:16px;padding:12px;margin:12px 0;border:1px solid rgba(255,215,0,0.2);">
+                        <p style="font-size:18px;color:#ffd740;">🎓 NCAA 畢業！</p>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:8px;">
+                        <button class="btn btn-success btn-block" id="btnNCAAToPro">🏆 返回香港進入職業聯賽</button>
+                        <button class="btn btn-danger btn-block" id="btnRetireNCAA">退役</button>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = html;
+
+            document.getElementById('btnNextNCAAYear')?.addEventListener('click', () => {
+                G.ncaaYear++;
+                G.questionIndex = 0;
+                G.answered = false;
+                G.distributed = false;
+                showDistributePage('NCAA 能力分配');
+                updateHeader();
+            });
+            document.getElementById('btnLeaveNCAA')?.addEventListener('click', () => {
+                G.timeline.push({ year: `NCAA第${year+1}年`, text: '決定離開 NCAA 返回香港', period: '學生' });
+                if (G.overall >= 48) {
+                    showTeamSelect('你決定返回香港，以下職業球隊對你感興趣：');
+                } else {
+                    G.retired = true;
+                    G.retirementReason = '離開 NCAA 後未能進入職業';
+                    G.gameOver = true;
+                    renderGame();
+                }
+            });
+            document.getElementById('btnNCAAToPro')?.addEventListener('click', () => {
+                showTeamSelect('NCAA 畢業，以下職業球隊對你感興趣：');
+            });
+            document.getElementById('btnRetireNCAA')?.addEventListener('click', () => {
+                G.retired = true;
+                G.retirementReason = 'NCAA 畢業後退役';
+                G.gameOver = true;
+                renderGame();
+            });
+            updateHeader();
+        }
+
+        // ================================================================
+        //  職業 (甲一/甲二/CBA) - 每年10條問題
+        // ================================================================
+        function renderPro(container) {
+            const isCBA = G.phase === 'cba';
+            const isA1 = G.phase === 'a1';
+            const year = isCBA ? G.cbaYear : (isA1 ? G.a1Year : G.a2Year);
+            const totalQ = 10; // 增加到10條
+            if (G.questionIndex >= totalQ) {
+                renderProSeasonEnd(container);
+                return;
+            }
+
+            checkInjury();
+
+            // 生成10條問題
+            const questions = [];
+            for (let i = 0; i < 10; i++) {
+                const qs = [
+                    { text: '職業賽季開始，你希望扮演什麼角色？', options: [
+                            { label: 'A. 得分主力', desc: '承擔進攻責任', diff: 3 },
+                            { label: 'B. 防守大鎖', desc: '專注限制對方王牌', diff: 2 },
+                            { label: 'C. 放手一搏', desc: isCBA ? '挑戰CBA MVP' : '挑戰聯賽MVP', diff: 5 }
+                        ] },
+                    { text: '季中球隊戰績不佳，教練壓力很大。你會？', options: [
+                            { label: 'A. 加倍訓練', desc: '以身作則', diff: 2 },
+                            { label: 'B. 與隊友溝通', desc: '團結士氣', diff: 1 },
+                            { label: 'C. 放手一搏', desc: '在記者會上承諾逆轉', diff: 4 }
+                        ] },
+                    { text: '季後賽關鍵戰，你手感火燙。你該？', options: [
+                            { label: 'A. 繼續出手', desc: '乘勝追擊', diff: 3 },
+                            { label: 'B. 吸引防守', desc: '為隊友創造機會', diff: 1 },
+                            { label: 'C. 放手一搏', desc: '挑戰個人得分紀錄', diff: 5 }
+                        ] },
+                    { text: '隊內出現矛盾，你如何處理？', options: [
+                            { label: 'A. 主動調解', desc: '找雙方溝通', diff: 2 },
+                            { label: 'B. 專注自己', desc: '不受影響', diff: 1 },
+                            { label: 'C. 強勢介入', desc: '直接解決', diff: 4 }
+                        ] },
+                    { text: '教練對你戰術安排不滿，你會？', options: [
+                            { label: 'A. 虛心接受', desc: '調整打法', diff: 2 },
+                            { label: 'B. 堅持自己', desc: '證明自己', diff: 3 },
+                            { label: 'C. 溝通協商', desc: '找出平衡', diff: 1 }
+                        ] },
+                    { text: '媒體質疑你的表現，你如何回應？', options: [
+                            { label: 'A. 用行動說話', desc: '場上證明', diff: 2 },
+                            { label: 'B. 正面回應', desc: '接受訪問', diff: 1 },
+                            { label: 'C. 忽略噪音', desc: '專注籃球', diff: 3 }
+                        ] },
+                    { text: '隊友受傷，你需承擔更多責任。你會？', options: [
+                            { label: 'A. 挺身而出', desc: '承擔重任', diff: 3 },
+                            { label: 'B. 穩健過渡', desc: '減少失誤', diff: 2 },
+                            { label: 'C. 激發隊友', desc: '讓團隊更好', diff: 1 }
+                        ] },
+                    { text: '你陷入得分荒，如何走出困境？', options: [
+                            { label: 'A. 改變打法', desc: '增加突破', diff: 3 },
+                            { label: 'B. 調整心態', desc: '放鬆自己', diff: 2 },
+                            { label: 'C. 增加訓練', desc: '找回手感', diff: 1 }
+                        ] },
+                    { text: '球隊簽下新球員，與你位置重疊。你會？', options: [
+                            { label: 'A. 良性競爭', desc: '提升自己', diff: 2 },
+                            { label: 'B. 團隊合作', desc: '協助隊友', diff: 1 },
+                            { label: 'C. 爭取正選', desc: '用實力說話', diff: 3 }
+                        ] },
+                    { text: '賽季最後一戰，你希望留下什麼？', options: [
+                            { label: 'A. 勝利', desc: '贏波為先', diff: 2 },
+                            { label: 'B. 個人數據', desc: '爭取好表現', diff: 3 },
+                            { label: 'C. 經典時刻', desc: '創造回憶', diff: 4 }
+                        ] }
+                ];
+                questions.push(qs[i % qs.length]);
+            }
+
+            const q = questions[G.questionIndex] || questions[0];
+
+            let injuryHtml = '';
+            if (G.injury && !G.injury.treated) {
+                injuryHtml = `
+                    <div class="injury-box">
+                        <p>🩹 你受傷了：<strong>${G.injury.name}</strong></p>
+                        <p>治療費用：${G.injury.cost} 萬</p>
+                        <button class="btn btn-success" id="btnTreatInjuryPro">💊 治療</button>
+                    </div>
+                `;
+            }
+
+            let html = `
+                <div class="year-display">
+                    <div class="year">🏆 ${isCBA ? 'CBA（高強度）' : (isA1 ? '甲一（業餘）' : '甲二（業餘）')} <span class="highlight">第 ${year+1} 年</span></div>
+                    <div class="progress">事件 ${G.questionIndex+1}/${totalQ}</div>
+                </div>
+                ${injuryHtml}
+                <div class="question-box">
+                    <div class="q-text">${q.text}</div>
+                </div>
+                <div class="options">
+            `;
+            const labels = ['A', 'B', 'C'];
+            q.options.forEach((opt, idx) => {
+                const disabled = G.answered ? 'disabled' : '';
+                const selected = G.answered && G.selectedOption === idx ? 'selected' : '';
+                html += `
+                    <button class="option-btn ${selected}" data-optidx="${idx}" ${disabled}>
+                        <span class="tag">${labels[idx]}</span>
+                        <span><strong>${opt.label}</strong> — ${opt.desc}</span>
+                    </button>
+                `;
+            });
+            html += `</div>`;
+
+            if (G.answered) {
+                const res = G.lastResult;
+                const diceEmoji = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'][res.dice - 1] || '🎲';
+                const statusClass = res.good ? 'positive' : (res.bad ? 'negative' : 'neutral');
+                const statusText = res.good ? '✅ 成功！' : (res.bad ? '❌ 失敗...' : '⚖️ 平穩');
+                html += `
+                    <div class="result-box">
+                        <div class="dice">${diceEmoji}</div>
+                        <div class="result-text"><span class="${statusClass}">${statusText}</span><br>${res.text}</div>
+                        <div class="stat-change">${res.changes.map(c => `<span class="${c.val>0?'up':'down'}">${c.label} ${c.val>0?'+':''}${c.val}</span>`).join('')}</div>
+                    </div>
+                    <button class="btn btn-primary btn-block" id="btnNextProQuestion">➡️ 下一個事件</button>
+                `;
+            }
+
+            container.innerHTML = html;
+
+            if (G.injury && !G.injury.treated) {
+                document.getElementById('btnTreatInjuryPro')?.addEventListener('click', () => {
+                    if (treatInjury()) renderGame();
+                });
+            }
+
+            if (!G.answered) {
+                container.querySelectorAll('.option-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const idx = parseInt(this.dataset.optidx);
+                        handleProAnswer(idx);
+                    });
+                });
+            } else {
+                const nextBtn = document.getElementById('btnNextProQuestion');
+                if (nextBtn) nextBtn.addEventListener('click', () => {
+                    G.answered = false;
+                    G.questionIndex++;
+                    renderGame();
+                });
+            }
+            updateHeader();
+        }
+
+        function handleProAnswer(optIdx) {
+            if (G.answered) return;
+            G.answered = true;
+            G.selectedOption = optIdx;
+            const isCBA = G.phase === 'cba';
+            const dice = rand(1, 6);
+            const diff = isCBA ? 4 : 3;
+            let good = false,
+                bad = false,
+                effect = 0,
+                resultText = '';
+            if (dice >= 5) { good = true;
+                effect = Math.round((diff * 2.5 + rand(0, 3)) * (isCBA ? 0.85 : 0.7));
+                resultText = pick(['在職業賽場打出名堂！', '表現出色！', '贏得球迷喝彩！']); } else if (dice >= 3) { good = false;
+                bad = false;
+                effect = rand(0, 2);
+                resultText = pick(['表現平穩', '逐漸適應節奏']); } else { bad = true;
+                effect = -Math.round((diff * 2.2 + rand(0, 3)) * (isCBA ? 0.7 : 0.55));
+                resultText = pick(['遇到撞牆期', '被對手壓制']); }
+
+            effect = clamp(effect, isCBA ? -7 : -5, isCBA ? 9 : 7);
+            const affected = shuffle([...ATTR_KEYS]).slice(0, 2);
+            const changes = [];
+            for (let k of affected) {
+                const change = Math.round(effect / 2 * (0.8 + Math.random() * 0.4));
+                const actual = clamp(change, isCBA ? -6 : -4, isCBA ? 7 : 5);
+                G.attributes[k] = clamp(G.attributes[k] + actual, 20, 99);
+                changes.push({ label: getAttrLabel(k), val: actual });
+            }
+            if (G.injury && !G.injury.treated) {
+                G.attributes.condition = clamp(G.attributes.condition - rand(2, 4), 20, 99);
+                changes.push({ label: '體能(傷)', val: -rand(2, 4) });
+            }
+            G.overall = calcOverall(G.attributes);
+            G.lastResult = { dice, good, bad, text: resultText, changes, optIdx };
+            if (good && dice === 6) G.careerHighlights.push(`職業第${(G.phase==='a1'?G.a1Year:G.a2Year)+1}年 高光！`);
+            renderGame();
+        }
+
+        function renderProSeasonEnd(container) {
+            const isCBA = G.phase === 'cba';
+            const isA1 = G.phase === 'a1';
+            const year = isCBA ? G.cbaYear : (isA1 ? G.a1Year : G.a2Year);
+            const overall = G.overall;
+            const ppg = Math.round((overall / (isCBA ? 7.5 : 9) + rand(0, isCBA ? 7 : 5)) * 10) / 10;
+            const rpg = Math.round((overall / (isCBA ? 11 : 14) + rand(0, 3.5)) * 10) / 10;
+            const apg = Math.round((overall / (isCBA ? 14 : 18) + rand(0, 2.5)) * 10) / 10;
+            const champion = rand(1, isCBA ? 12 : 8) <= 2;
+            const mvp = champion && rand(1, isCBA ? 4 : 3) === 1;
+            let salary = 0;
+            if (isCBA) {
+                salary = overall >= 75 ? 280000 + rand(0, 80) * 1000 : (overall >= 65 ? 180000 + rand(0, 50) * 1000 :
+                    120000 + rand(0, 40) * 1000);
+            } else {
+                salary = isA1 ? (55 + rand(0, 35)) * 10000 : (18 + rand(0, 12)) * 10000;
+            }
+
+            const stat = { year: year + 1, ppg, rpg, apg, champion, mvp, salary, league: isCBA ? 'CBA' : (isA1 ? '甲一' :
+                    '甲二') };
+            if (isCBA) {
+                G.cbaStats.push(stat);
+                if (champion) G.careerAwards.push('CBA總冠軍');
+                if (mvp) G.careerAwards.push('CBA總決賽MVP');
+                G.cbaYear++;
+                G.cbaContractYear++;
+            } else if (isA1) {
+                G.a1Stats.push(stat);
+                if (champion) G.careerAwards.push('甲一冠軍');
+                if (mvp) G.careerAwards.push('甲一MVP');
+                G.a1Year++;
+                G.contractYear++;
+            } else {
+                G.a2Stats.push(stat);
+                if (champion) G.careerAwards.push('甲二冠軍');
+                if (mvp) G.careerAwards.push('甲二MVP');
+                G.a2Year++;
+                G.contractYear++;
+            }
+            G.totalGames += isCBA ? 35 : 28;
+            G.totalPoints += Math.round(ppg * (isCBA ? 35 : 28));
+            G.totalAssists += Math.round(apg * (isCBA ? 35 : 28));
+            G.totalRebounds += Math.round(rpg * (isCBA ? 35 : 28));
+            G.totalSalary += salary;
+            G.money += salary / 10000;
+            G.timeline.push({ year: `職業第${year+1}年`, text: `${isCBA?'CBA':(isA1?'甲一':'甲二')} 場均 ${ppg}分 ${rpg}板 ${apg}助 ${champion?'🏆奪冠':''}`,
+                period: isCBA ? '職業' : '業餘' });
+
+            // 香港隊機率提升20%
+            if (overall >= 58 && !G.hkTeam && rand(1, 100) <= 42 + 20) {
+                G.hkTeam = true;
+                G.careerAwards.push('香港代表隊');
+                G.timeline.push({ year: `職業第${year+1}年`, text: '入選香港代表隊！', period: isCBA ? '職業' : '業餘' });
+                if (!G.hkTeamExtraActive) {
+                    G.hkTeamExtraActive = true;
+                    G.hkTeamExtraQuestions = 5;
+                    G.answered = false;
+                }
+                showNotification('🇭🇰 恭喜入選香港代表隊！');
+            }
+            if (overall >= 52 && !G.developmentTeam && rand(1, 100) <= 50 + 20) {
+                G.developmentTeam = true;
+                G.careerAwards.push('香港發展隊');
+                G.timeline.push({ year: `職業第${year+1}年`, text: '入選香港發展隊', period: isCBA ? '職業' : '業餘' });
+                showNotification('📌 你入選了香港發展隊！');
+            }
+
+            if (isCBA && overall >= 68 && rand(1, 100) <= 55) {
+                G.allStarAppearances++;
+                G.careerAwards.push('CBA全明星賽入選');
+                if (rand(1, 4) === 1) {
+                    G.allStarMVP++;
+                    G.careerAwards.push('CBA全明星MVP');
+                }
+            }
+
+            if (G.age >= 28 && G.age <= 36 && overall > G.peakOverall) {
+                G.peakOverall = overall;
+                G.peakAttributes = { ...G.attributes };
+                G.peakAge = G.age;
+            }
+
+            let pointsEarned = isCBA ? 2 + rand(1, 2) : 1 + rand(1, 2);
+            if (champion) pointsEarned += isCBA ? 3 : 2;
+            if (mvp) pointsEarned += isCBA ? 4 : 2;
+            // 提高升總評：額外獎勵
+            if (ppg >= 25) pointsEarned += 1;
+            if (rpg >= 12) pointsEarned += 1;
+            if (apg >= 8) pointsEarned += 1;
+            G.availablePoints += pointsEarned;
+
+            if (G.injury && G.injury.treated) G.injury = null;
+
+            let html = `
+                <div class="season-end">
+                    <h3 style="color:#ffa500;text-align:center;">🏆 ${isCBA?'CBA':(isA1?'甲一':'甲二')} 第 ${year+1} 年 結束</h3>
+                    <div class="season-summary">
+                        <p><strong>📊 職業數據</strong></p>
+                        <p><span class="stat-big">🏀 ${ppg}</span> 分 &nbsp;|&nbsp; <span class="stat-big">📥 ${rpg}</span> 板 &nbsp;|&nbsp; <span class="stat-big">🎯 ${apg}</span> 助</p>
+                        <p>${champion ? '🏆 奪得總冠軍！' : '❌ 未能奪冠'}</p>
+                        <p>${mvp ? '🏅 榮獲總決賽MVP！' : ''}</p>
+                        <p>💰 年薪：$${(salary/10000).toFixed(1)} 萬</p>
+                        <p>🔥 總評：${overall}</p>
+                        <p>🎁 獲得 <strong style="color:#ffd740;">${pointsEarned}</strong> 個分值！</p>
+                        <p>💰 資金：${G.money.toFixed(1)} 萬</p>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+                        <button class="btn btn-primary btn-block" id="btnContinuePro">➡️ 繼續 (進入下一年)</button>
+                        <button class="btn btn-danger btn-block" id="btnRetirePro">🏁 退役</button>
+                    </div>
+                </div>
+            `;
+            container.innerHTML = html;
+
+            document.getElementById('btnContinuePro')?.addEventListener('click', () => {
+                if (isCBA) {
+                    if (G.cbaContractYear > G.cbaContractLength) G.freeAgent = true;
+                } else {
+                    if (G.contractYear > G.contractLength) G.freeAgent = true;
+                }
+                G.questionIndex = 0;
+                G.answered = false;
+                G.distributed = false;
+                G.seasonMatches = [];
+                specialEventTriggered = false;
+                showDistributePage('職業能力分配');
+                updateHeader();
+            });
+            document.getElementById('btnRetirePro')?.addEventListener('click', () => {
+                G.retired = true;
+                G.retirementReason = '結束職業生涯';
+                G.gameOver = true;
+                renderGame();
+            });
+            updateHeader();
+        }
+
+        // ================================================================
+        //  合約管理 (移除CBA次數顯示)
+        // ================================================================
+        function renderContractManagement(container) {
+            const isCBA = G.phase === 'cba';
+            const currentTeam = isCBA ? G.cbaTeam : G.team;
+            const overall = G.overall;
+
+            let html = `
+                <div class="season-end">
+                    <h3 style="color:#ffa500;text-align:center;">📄 合約管理</h3>
+                    <div class="season-summary">
+                        <p>目前球隊：<strong>${currentTeam || '無'}</strong> (${isCBA ? 'CBA' : (G.phase==='a1'?'甲一':'甲二')})</p>
+                        <p>合約狀態：${G.freeAgent ? '自由球員' : `合約到期`}</p>
+                        <p>當前總評：${overall}</p>
+                        <p>🏅 CBA 選秀機會：${G.cbaDrafted ? '✅ 已獲選' : `${G.cbaDraftAttempts}/3 次`}</p>
+                        <p>💰 資金：${G.money.toFixed(1)} 萬</p>
+                    </div>
+            `;
+
+            if (!G.cbaDrafted && G.cbaDraftAttempts < 3 && !isCBA) {
+                let draftChance = 5;
+                if (overall >= 70) draftChance = 95;
+                else if (overall >= 58) draftChance = 70;
+                else if (overall >= 48) draftChance = 20;
+                else if (overall >= 40) draftChance = 10;
+                else draftChance = 5;
+
+                html += `
+                    <div style="background:rgba(255,215,0,0.1);border-radius:12px;padding:10px;margin:10px 0;border:1px solid rgba(255,215,0,0.3);">
+                        <p style="color:#ffd740;">🏀 你獲得 CBA 選秀機會！</p>
+                        <p>根據總評 ${overall}，預估入選機率約 <strong>${draftChance}%</strong></p>
+                        <button class="btn btn-primary btn-block mt-10" id="btnCBA_Draft">🏅 參加 CBA 選秀</button>
+                    </div>
+                `;
+            }
+
+            if (G.freeAgent) {
+                html += `<p style="color:#ffd740;">🏀 你現在是自由球員，以下球隊對你有興趣：</p>`;
+                const interested = getInterestedTeams(overall);
+                if (interested.length === 0) {
+                    html += `<p style="color:#ff8a80;">沒有球隊對你感興趣，你可能需要考慮退役。</p>`;
+                    html += `<button class="btn btn-danger btn-block mt-10" id="btnRetireFree">退役</button>`;
+                } else {
+                    html += `<div class="team-choice-grid">`;
+                    interested.forEach(team => {
+                        const salary = (team.league === '甲一' ? 55 + rand(0, 30) : 15 + rand(0, 12)) * 10000;
+                        const thought = pick(THOUGHTS);
+                        html += `
+                            <button class="team-choice-btn" data-team="${team.name}" data-league="${team.league}" data-salary="${salary}">
+                                <div class="team-name">${team.name}</div>
+                                <div class="team-detail">${team.league}（業餘）</div>
+                                <div class="team-salary">💰 年薪 $${(salary/10000).toFixed(1)} 萬</div>
+                                <div class="team-thought">💭 ${thought}</div>
+                            </button>
+                        `;
+                    });
+                    html += `</div>`;
+                }
+            } else {
+                if (isCBA) {
+                    const renewSalary = 150000 + rand(0, 60) * 1000;
+                    const renewLength = rand(1, 2);
+                    html += `
+                        <p style="color:#aabbdd;">原隊 <strong>${currentTeam}</strong> 提供一份 ${renewLength} 年 CBA 合約。</p>
+                        <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+                            <button class="btn btn-success" id="btnRenewCBA">✅ 接受續約 (${renewLength}年)</button>
+                            <button class="btn btn-secondary" id="btnOtherCBA">🔄 嘗試加盟其他 CBA 球隊</button>
+                            <button class="btn btn-danger" id="btnLeaveCBA">❌ 離開 CBA，回到香港聯賽</button>
+                        </div>
+                    `;
+                } else {
+                    const renewSalary = (G.phase === 'a1' ? 50 + rand(0, 30) : 15 + rand(0, 10)) * 10000;
+                    const renewLength = rand(1, 2);
+                    html += `
+                        <p style="color:#aabbdd;">原隊 <strong>${currentTeam}</strong> 提供一份 ${renewLength} 年合約。</p>
+                        <div style="display:flex;flex-direction:column;gap:8px;margin-top:10px;">
+                            <button class="btn btn-success" id="btnRenew">✅ 接受續約 (${renewLength}年)</button>
+                            <button class="btn btn-danger" id="btnDeclineRenew">❌ 拒絕，進入自由球員市場</button>
+                        </div>
+                    `;
+                }
+            }
+
+            container.innerHTML = html;
+
+            document.getElementById('btnCBA_Draft')?.addEventListener('click', () => {
+                if (G.cbaDraftAttempts >= 3) {
+                    showNotification('❌ 已用完選秀機會');
+                    return;
+                }
+                G.cbaDraftAttempts++;
+                let chance = 5;
+                if (overall >= 70) chance = 95;
+                else if (overall >= 58) chance = 70;
+                else if (overall >= 48) chance = 20;
+                else if (overall >= 40) chance = 10;
+                else chance = 5;
+
+                const roll = rand(1, 100);
+                if (roll <= chance) {
+                    G.cbaDrafted = true;
+                    G.cbaTeam = pick(CBA_TEAMS);
+                    G.phase = 'cba';
+                    G.cbaContractYear = 1;
+                    G.cbaContractLength = rand(1, 2);
+                    G.freeAgent = false;
+                    G.timeline.push({ year: 'CBA', text: `被 ${G.cbaTeam} 選中`, period: '職業' });
+                    G.careerHighlights.push(`CBA 選秀成功！加盟 ${G.cbaTeam}`);
+                    showNotification(`🎉 恭喜！被 ${G.cbaTeam} 選中！（機率 ${chance}%）`);
+                    G.distributed = false;
+                    showDistributePage('CBA 能力分配');
+                    updateHeader();
+                } else {
+                    showNotification(`❌ 選秀落選（機率 ${chance}%），繼續努力！`);
+                    G.timeline.push({ year: 'CBA', text: '選秀落選', period: '業餘' });
+                    renderGame();
+                }
+            });
+
+            if (G.freeAgent) {
+                const retireBtn = document.getElementById('btnRetireFree');
+                if (retireBtn) {
+                    retireBtn.addEventListener('click', () => {
+                        G.retired = true;
+                        G.retirementReason = '無球隊感興趣，選擇退役';
+                        G.gameOver = true;
+                        renderGame();
+                    });
+                }
+                document.querySelectorAll('.team-choice-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const teamName = this.dataset.team;
+                        const league = this.dataset.league;
+                        const salary = parseInt(this.dataset.salary);
+                        G.team = teamName;
+                        G.phase = league === '甲一' ? 'a1' : 'a2';
+                        G.contractYear = 1;
+                        G.contractLength = rand(1, 2);
+                        G.freeAgent = false;
+                        if (G.phase === 'a1') G.a1Year++;
+                        else G.a2Year++;
+                        G.totalSalary += salary;
+                        G.money += salary / 10000;
+                        G.timeline.push({ year: `職業`, text: `自由球員簽約 ${teamName} (${G.contractLength}年)`,
+                            period: '業餘' });
+                        G.careerHighlights.push(`加盟 ${teamName}`);
+                        G.distributed = false;
+                        showDistributePage('新賽季能力分配');
+                        updateHeader();
+                    });
+                });
+            } else {
+                const renewBtn = document.getElementById('btnRenew') || document.getElementById('btnRenewCBA');
+                if (renewBtn) {
+                    renewBtn.addEventListener('click', () => {
+                        if (isCBA) {
+                            G.cbaContractYear = 1;
+                            G.cbaContractLength = rand(1, 2);
+                            G.freeAgent = false;
+                            G.timeline.push({ year: `CBA`, text: `與 ${G.cbaTeam} 續約 ${G.cbaContractLength} 年`,
+                                period: '職業' });
+                        } else {
+                            G.contractYear = 1;
+                            G.contractLength = rand(1, 2);
+                            G.freeAgent = false;
+                            G.timeline.push({ year: `職業`, text: `與 ${G.team} 續約 ${G.contractLength} 年`,
+                                period: '業餘' });
+                        }
+                        G.distributed = false;
+                        showDistributePage('續約後能力分配');
+                        updateHeader();
+                    });
+                }
+                const otherBtn = document.getElementById('btnOtherCBA');
+                if (otherBtn) {
+                    otherBtn.addEventListener('click', () => {
+                        const otherTeams = CBA_TEAMS.filter(t => t !== G.cbaTeam);
+                        const newTeam = pick(otherTeams);
+                        G.cbaTeam = newTeam;
+                        G.cbaContractYear = 1;
+                        G.cbaContractLength = rand(1, 2);
+                        G.freeAgent = false;
+                        G.timeline.push({ year: `CBA`, text: `轉會至 ${newTeam} (${G.cbaContractLength}年)`,
+                            period: '職業' });
+                        G.distributed = false;
+                        showDistributePage('CBA 能力分配');
+                        updateHeader();
+                    });
+                }
+                const leaveBtn = document.getElementById('btnLeaveCBA');
+                if (leaveBtn) {
+                    leaveBtn.addEventListener('click', () => {
+                        G.phase = G.overall >= 50 ? 'a1' : 'a2';
+                        G.team = pick(G.phase === 'a1' ? A1_TEAMS : A2_TEAMS);
+                        G.contractYear = 1;
+                        G.contractLength = rand(1, 2);
+                        G.freeAgent = false;
+                        G.cbaTeam = null;
+                        G.cbaContractYear = 0;
+                        G.cbaContractLength = 0;
+                        G.timeline.push({ year: `職業`, text: `離開 CBA，加盟香港 ${G.team}`, period: '業餘' });
+                        G.distributed = false;
+                        showDistributePage('職業能力分配');
+                        updateHeader();
+                    });
+                }
+                const declineBtn = document.getElementById('btnDeclineRenew');
+                if (declineBtn) {
+                    declineBtn.addEventListener('click', () => {
+                        G.freeAgent = true;
+                        G.contractYear = 0;
+                        G.contractLength = 0;
+                        G.timeline.push({ year: `職業`, text: `拒絕續約，成為自由球員`, period: '業餘' });
+                        renderGame();
+                        updateHeader();
+                    });
+                }
+            }
+        }
+
+        function getInterestedTeams(overall) {
+            let pool = [];
+            if (overall >= 50) {
+                pool = A1_TEAMS.map(name => ({ name, league: '甲一' }));
+            } else if (overall >= 40) {
+                pool = A2_TEAMS.map(name => ({ name, league: '甲二' }));
+            } else {
+                return [];
+            }
+            const shuffled = shuffle(pool);
+            return shuffled.slice(0, rand(3, 5));
+        }
+
+        // ================================================================
+        //  GAME OVER + 雷達圖
+        // ================================================================
+        function renderGameOver(container) {
+            const overall = G.overall;
+            const totalGames = G.totalGames || 1;
+            const avgPts = (G.totalPoints / totalGames).toFixed(1);
+            const avgReb = (G.totalRebounds / totalGames).toFixed(1);
+            const avgAst = (G.totalAssists / totalGames).toFixed(1);
+            const totalSalary = G.totalSalary;
+
+            let evaluation = '';
+            if (overall >= 82) evaluation = '🏆 傳奇級別，香港籃球殿堂人物！';
+            else if (overall >= 72) evaluation = '⭐ 頂級球星，為香港籃球貢獻良多。';
+            else if (overall >= 62) evaluation = '💪 實力派球員，職業生涯穩定。';
+            else if (overall >= 52) evaluation = '📈 努力的球員，值得尊敬。';
+            else evaluation = '🔰 籃球生涯雖短，但熱情可嘉。';
+
+            const awards = G.careerAwards.length ? [...new Set(G.careerAwards)].join('、') : '無';
+
+            if (!G.peakAttributes) {
+                G.peakAttributes = { ...G.attributes };
+                G.peakOverall = overall;
+                G.peakAge = Math.min(33, G.age);
+            }
+
+            setTimeout(() => drawRadarChart(), 150);
+
+            const studentEvents = G.timeline.filter(t => t.period === '學生');
+            const amateurEvents = G.timeline.filter(t => t.period === '業餘');
+            const proEvents = G.timeline.filter(t => t.period === '職業');
+
+            let html = `
+                <div style="text-align:center;padding:12px 0;">
+                    <div style="font-size:48px;">🏀</div>
+                    <h2 style="color:#ffa500;">生涯完結</h2>
+                    <p style="font-size:18px;font-weight:700;">${evaluation}</p>
+                    <div class="season-summary">
+                        <p><strong>📊 生涯總數據</strong></p>
+                        <p><span class="stat-big">🏀 ${G.totalPoints}</span> 分 &nbsp;|&nbsp; 場均 <span class="stat-big">${avgPts}</span> 分</p>
+                        <p><span class="stat-big">📥 ${G.totalRebounds}</span> &nbsp;|&nbsp; 場均 <span class="stat-big">${avgReb}</span></p>
+                        <p><span class="stat-big">🎯 ${G.totalAssists}</span> &nbsp;|&nbsp; 場均 <span class="stat-big">${avgAst}</span></p>
+                        <p>💰 生涯總薪資：$${(totalSalary/10000).toFixed(1)} 萬港幣</p>
+                        <p>🏅 榮譽：${awards}</p>
+                        <hr style="border-color:rgba(255,255,255,0.1);margin:6px 0;">
+                        <p>🔥 最終總評：<span style="font-size:24px;color:#ff6d00;font-weight:900;">${overall}</span></p>
+                        <p>📖 最終學業：${Math.round(G.academic)}</p>
+                        <p>🎂 退役年齡：${G.age} 歲</p>
+                        <p>${G.hkTeam ? '🇭🇰 曾入選香港代表隊' : ''} ${G.developmentTeam ? '📌 曾入選發展隊' : ''}</p>
+                        <p>🏅 全運會：U19 ${G.allChinaGamesU19} 次，成年 ${G.allChinaGamesAdult} 次</p>
+                        <p>⭐ 全明星賽：${G.allStarAppearances} 次${G.allStarMVP ? ` (MVP ${G.allStarMVP} 次)` : ''}</p>
+                        <p>${G.cbaDrafted ? `🏀 CBA 選秀成功 (${G.cbaTeam})` : G.cbaDraftAttempts>0 ? `🏀 CBA 選秀 ${G.cbaDraftAttempts} 次未中` : ''}</p>
+                        <p>${G.ncaaTeam ? `🇺🇸 曾效力 NCAA ${G.ncaaLevel} (${G.ncaaTeam})` : ''}</p>
+                        <p style="color:#8899bb;font-size:12px;">退役原因：${G.retirementReason || '圓滿結束'}</p>
+                        ${G.growthSpurt ? `<p style="color:#4fc3f7;">🌱 發育期曾長高，最終身高 ${G.player.height} cm</p>` : ''}
+                        ${G.positionTraining.length > 0 ? `<p style="color:#69f0ae;">🔀 多位置訓練：${G.positionTraining.join(' → ')}</p>` : ''}
+                    </div>
+
+                    <div class="career-chart">
+                        <p style="color:#ffa500;font-weight:700;margin-bottom:6px;">📈 巔峰 vs 退役 能力雷達圖</p>
+                        <p style="font-size:12px;color:#8899bb;">巔峰約 ${G.peakAge} 歲（總評 ${G.peakOverall}） vs 退役時（總評 ${overall}）</p>
+                        <canvas id="radarCanvas" width="500" height="320"></canvas>
+                    </div>
+
+                    <div class="timeline">
+                        <p style="font-weight:700;color:#ffa500;">📅 生涯時間線</p>
+                        <p style="color:#4fc3f7;margin-top:8px;">🎓 學生時期</p>
+                        ${studentEvents.length ? studentEvents.map(t => `<div class="event"><span>${t.year}</span><span>${t.text}</span></div>`).join('') : '<div class="event"><span>-</span><span>無特別記錄</span></div>'}
+                        <p style="color:#69f0ae;margin-top:8px;">🏀 業餘時期（甲一 / 甲二）</p>
+                        ${amateurEvents.length ? amateurEvents.map(t => `<div class="event"><span>${t.year}</span><span>${t.text}</span></div>`).join('') : '<div class="event"><span>-</span><span>無特別記錄</span></div>'}
+                        <p style="color:#ff8c00;margin-top:8px;">🏆 職業時期（CBA）</p>
+                        ${proEvents.length ? proEvents.map(t => `<div class="event"><span>${t.year}</span><span>${t.text}</span></div>`).join('') : '<div class="event"><span>-</span><span>無特別記錄</span></div>'}
+                    </div>
+                    <button class="btn btn-primary btn-block mt-10" id="btnReviewMenu">🏠 回到主選單</button>
+                </div>
+            `;
+            container.innerHTML = html;
+            document.getElementById('btnReviewMenu').addEventListener('click', () => {
+                showPage('pageCreate');
+                document.getElementById('headerBadge').style.display = 'none';
+                document.getElementById('infoBar').style.display = 'none';
+            });
+            updateHeader();
+        }
+
+        function drawRadarChart() {
+            const canvas = document.getElementById('radarCanvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width,
+                h = canvas.height;
+            ctx.clearRect(0, 0, w, h);
+
+            const centerX = w / 2;
+            const centerY = h / 2 + 10;
+            const radius = Math.min(w, h) * 0.38;
+            const labels = ATTR_KEYS.map(k => ATTR_LABELS[k]);
+            const peakVals = ATTR_KEYS.map(k => (G.peakAttributes[k] || 40) / 100);
+            const retireVals = ATTR_KEYS.map(k => (G.attributes[k] || 40) / 100);
+            const angleStep = (Math.PI * 2) / 6;
+
+            ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+            ctx.lineWidth = 1;
+            for (let r = 0.2; r <= 1; r += 0.2) {
+                ctx.beginPath();
+                for (let i = 0; i < 6; i++) {
+                    const ang = -Math.PI / 2 + i * angleStep;
+                    const x = centerX + Math.cos(ang) * radius * r;
+                    const y = centerY + Math.sin(ang) * radius * r;
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.stroke();
+            }
+
+            for (let i = 0; i < 6; i++) {
+                const ang = -Math.PI / 2 + i * angleStep;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(centerX + Math.cos(ang) * radius, centerY + Math.sin(ang) * radius);
+                ctx.stroke();
+            }
+
+            ctx.fillStyle = '#aabbdd';
+            ctx.font = '12px sans-serif';
+            ctx.textAlign = 'center';
+            for (let i = 0; i < 6; i++) {
+                const ang = -Math.PI / 2 + i * angleStep;
+                const x = centerX + Math.cos(ang) * (radius + 22);
+                const y = centerY + Math.sin(ang) * (radius + 22);
+                ctx.fillText(labels[i], x, y + 4);
+            }
+
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const ang = -Math.PI / 2 + i * angleStep;
+                const val = peakVals[i];
+                const x = centerX + Math.cos(ang) * radius * val;
+                const y = centerY + Math.sin(ang) * radius * val;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(255,165,0,0.25)';
+            ctx.fill();
+            ctx.strokeStyle = '#ff8c00';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+
+            ctx.beginPath();
+            for (let i = 0; i < 6; i++) {
+                const ang = -Math.PI / 2 + i * angleStep;
+                const val = retireVals[i];
+                const x = centerX + Math.cos(ang) * radius * val;
+                const y = centerY + Math.sin(ang) * radius * val;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fillStyle = 'rgba(79,195,247,0.2)';
+            ctx.fill();
+            ctx.strokeStyle = '#4fc3f7';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = '#ff8c00';
+            ctx.fillRect(20, 12, 14, 10);
+            ctx.fillStyle = '#fff';
+            ctx.font = '11px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(`巔峰 (${G.peakAge}歲)`, 40, 21);
+
+            ctx.fillStyle = '#4fc3f7';
+            ctx.fillRect(140, 12, 14, 10);
+            ctx.fillStyle = '#fff';
+            ctx.fillText(`退役 (${G.age}歲)`, 160, 21);
+        }
+
+        // ================================================================
+        //  THREADS
+        // ================================================================
+        function generateThreads(grade, ppg, rpg, apg, overall, elite) {
+            const users = ['籃球仔_', 'hkballer', 'northpoint_hooper', 'd1_fan', 'elite_watcher', 'hoopdreams', '甲一 scouts'];
+            const comments = [];
+            if (ppg > 18) comments.push('🔥 得分機器！');
+            else if (ppg > 13) comments.push('穩定輸出，球隊支柱！');
+            else comments.push('繼續磨練，將來可期！');
+            if (rpg > 7) comments.push('籃板怪獸！');
+            if (apg > 4) comments.push('視野一流！');
+            if (elite) comments.push('精英賽見真章！');
+            else comments.push('下年再嚟過！');
+            if (overall >= 68) comments.push('🌟 全明星級別！');
+            if (overall >= 55) comments.push('甲一球隊應該留意佢！');
+            const shuffled = shuffle(comments);
+            const selected = shuffled.slice(0, rand(3, 4));
+            return selected.map(text => ({ user: pick(users), text }));
+        }
+
+        // ================================================================
+        //  INIT
+        // ================================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded - 強化版 v3');
+            showPage('pageCreate');
+
+            // 種子碼隨機生成
+            document.getElementById('btnGenSeed').addEventListener('click', function() {
+                const seed = String(Date.now()).slice(-6) + String(rand(100, 999));
+                document.getElementById('seedInput').value = seed;
+            });
+
+            document.getElementById('btnStartGame').addEventListener('click', function() {
+                if (createPlayer()) { /* ok */ }
+            });
+
+            document.getElementById('btnStartGameplay').addEventListener('click', startGameplay);
+            document.getElementById('saveGameBtn').addEventListener('click', saveGame);
+            document.getElementById('loadGameBtn').addEventListener('click', loadGame);
+
+            document.getElementById('inputHeight').addEventListener('change', function() {
+                const h = parseInt(this.value) || 180;
+                const ws = document.getElementById('inputWingspan');
+                ws.min = h - 5;
+                ws.max = h + 20;
+                if (parseInt(ws.value) < h - 5) ws.value = h - 5;
+                if (parseInt(ws.value) > h + 20) ws.value = h + 20;
+            });
+            document.getElementById('inputHeight').dispatchEvent(new Event('change'));
+
+            document.querySelectorAll('#inputName, #inputNumber, #inputHeight, #inputWingspan, #inputWeight, #inputPosition, #inputRegion')
+                .forEach(el => el.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById(
+                        'btnStartGame').click(); }));
+
+            setInterval(() => {
+                if (G.player && !G.gameOver) {
+                    try { localStorage.setItem('hkbball_save_v3', JSON.stringify(G)); } catch (e) {}
+                }
+            }, 30000);
+
+            try {
+                const data = localStorage.getItem('hkbball_save_v3');
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    if (parsed.player) {
+                        Object.assign(G, parsed);
+                        if (G.gameOver) {
+                            showPage('pageGame');
+                            renderGame();
+                        } else {
+                            if (!G.distributed) { showDistributePage('繼續能力分配'); } else { showPage('pageGame');
+                                renderGame(); }
+                        }
+                        updateHeader();
+                    }
+                }
+            } catch (e) { console.error('Load error:', e); }
+        });
+    </script>
+</body>
+</html>
